@@ -19,3 +19,9 @@
     }
   }
 }
+
+.categories-swiper {
+  :global(.swiper-slide) {
+    width: auto;
+  }
+}

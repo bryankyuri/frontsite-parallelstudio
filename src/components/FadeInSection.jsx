@@ -7,12 +7,15 @@ export const FadeInSection = React.memo(({ children, delay = 0 }) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.2,
+    threshold: 0.1, // Reduced threshold for earlier trigger
+    rootMargin: "50px 0px", // Trigger before element enters viewport
   });
 
   useEffect(() => {
     if (inView) {
       controls.start("visible");
+    } else {
+      controls.set("hidden");
     }
   }, [controls, inView]);
 
@@ -22,13 +25,19 @@ export const FadeInSection = React.memo(({ children, delay = 0 }) => {
       initial="hidden"
       animate={controls}
       variants={{
-        hidden: { opacity: 0, y: 30 },
+        hidden: { 
+          opacity: 0, 
+          y: 20,
+          transition: {
+            duration: 0.1
+          }
+        },
         visible: {
           opacity: 1,
           y: 0,
           transition: {
-            duration: 0.6,
-            ease: "easeOut",
+            duration: 0.5,
+            ease: [0.25, 0.1, 0.25, 1], // Custom easing
             delay: delay,
           },
         },
