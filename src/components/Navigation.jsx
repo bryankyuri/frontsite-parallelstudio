@@ -11,7 +11,9 @@ const Navigation = ({ deviceType }) => {
   return (
     <>
       {deviceType === "desktop" ? (
-        <header className={`bg-white fixed z-50 w-full text-black h-[62px] flex items-center`}>
+        <header
+          className={`bg-white fixed z-50 w-full text-black h-[62px] flex items-center`}
+        >
           <nav className="container mx-auto py-4 px-5 flex justify-between items-center">
             <Link to="/" className="text-xl font-bold">
               <img
@@ -56,9 +58,15 @@ const Navigation = ({ deviceType }) => {
       ) : (
         <>
           <header className={`bg-white fixed z-50 w-full text-black`}>
-            <nav className="container mx-auto py-4 px-[10px] flex justify-between items-center">
-              <Link to="/" className="text-xl font-bold">
-                PARAIIIIEL STUDIO
+            <nav className="container mx-auto py-4 px-[20px] flex justify-between items-center">
+              <Link to="/">
+                <img
+                  className=" invert"
+                  src="/logo.png"
+                  alt="Logo"
+                  width={"198px"}
+                  height={"auto"}
+                />
               </Link>
 
               <button
