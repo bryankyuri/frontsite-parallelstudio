@@ -1,39 +1,67 @@
-import React, { useState } from 'react';
-import styles from '../styles/Contact.module.scss';
+import React, { useContext, useState } from "react";
+import styles from "../styles/Contact.module.scss";
+import { AppContext } from "../context/AppContext";
 
 const Contact = () => {
+  const { deviceType, vh } = useContext(AppContext);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission here
-    console.log('Form submitted:', formData);
-    alert('Thank you for your message! We will get back to you soon.');
+    console.log("Form submitted:", formData);
+    alert("Thank you for your message! We will get back to you soon.");
     // Reset form
     setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
     });
   };
 
   return (
     <div className={styles.contact}>
-      <div className="container mx-auto px-6 py-12">
+      <div className="w-full lg:text-center px-5 py-20 leading-[120%] text-black font-bold lg:text-[40px] text-[36px] uppercase">
+        {deviceType === "desktop" ? (
+          <>Collaborate? Or maybe join our team of artists</>
+        ) : (
+          <>
+            Collaborate?
+            <br /> Or maybe join
+            <br /> our team of
+            <br /> artists
+          </>
+        )}
+      </div>
+      <div
+        className={`w-full bg-black text-white py-32 relative ${styles.heroBanner} flex lg:justify-center lg:items-center justify-start items-end`}
+        style={{
+          height:
+            deviceType === "desktop"
+              ? "calc(100vh - 62px)"
+              : "calc(100vh - 66px)",
+          backgroundImage: `url('/hero-banner-contact.png')`,
+          backgroundSize: deviceType === "desktop" ? "100% auto" : "auto 100%",
+          backgroundPosition:
+            deviceType === "desktop" ? `center 0px` : "90% 0px",
+          backgroundRepeat: "no-repeat",
+        }}
+      ></div>
+      {/* <div className="container mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold mb-8">Contact Us</h1>
         
         <div className="grid md:grid-cols-2 gap-12">
@@ -135,7 +163,7 @@ const Contact = () => {
             </form>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

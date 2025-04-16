@@ -4,6 +4,7 @@ import { fetchData } from "../api/index";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import styles from "../styles/Home.module.scss";
+import stylesWork from "../styles/Works.module.scss";
 import { IconTriangle } from "../components/Icon/IconTriangle";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
@@ -228,7 +229,7 @@ const Home = () => {
             {/* First Row (2 Columns) */}
             <div className="grid md:grid-cols-2 grid-cols-1 gap-6 mb-6">
               {dataWorks.slice(0, 2).map((work) => (
-                <Link to={`/works/${work.id}`} className={styles.workItem}>
+                <Link to={`/works/${work.id}`} className={stylesWork.workItem}>
                   <div className="overflow-hidden">
                     <img
                       src={work.imageUrl}
@@ -250,7 +251,7 @@ const Home = () => {
             {/* Second Row (3 Columns) */}
             <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
               {dataWorks.slice(2, 5).map((work) => (
-                <Link to={`/works/${work.id}`} className={styles.workItem}>
+                <Link to={`/works/${work.id}`} className={stylesWork.workItem}>
                   <div className="overflow-hidden">
                     <img
                       src={work.imageUrl}
