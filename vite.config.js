@@ -94,6 +94,13 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
+    host: '0.0.0.0', // Allow connections from any IP
+    strictPort: true, // Don't try another port if 3000 is in use
+    hmr: {
+      clientPort: 443,
+      host: 'parallelstudio.virtual-app.my.id',
+    },
+    cors: true, // Enable CORS
   },
   build: {
     outDir: 'dist',

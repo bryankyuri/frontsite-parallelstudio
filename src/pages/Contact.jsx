@@ -54,7 +54,7 @@ const Contact = () => {
             deviceType === "desktop"
               ? "calc(100vh - 62px)"
               : "calc(100vh - 66px)",
-          backgroundImage: `url('/hero-banner-contact.png')`,
+          backgroundImage: `url('/hero-banner-contact.jpg')`,
           backgroundSize: deviceType === "desktop" ? "100% auto" : "auto 100%",
           backgroundPosition:
             deviceType === "desktop" ? `center 0px` : "90% 0px",

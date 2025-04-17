@@ -146,14 +146,24 @@ const Home = () => {
             <div className="absolute top-0 left-0 w-full h-[calc(100vh-62px)]">
               <video
                 src="https://cdn.jasonbradley.co/pic/ff41675d.mp4"
-                loop="loop"
-                muted="muted"
-                playsInline=""
-                nocontrols=""
+                loop
+                muted
+                playsInline
+                autoPlay
                 className="absolute w-full h-full top-0 left-0"
                 data-critical=""
                 style={{ objectFit: "cover" }}
-                autoPlay="autoPlay"
+                ref={(el) => {
+                  if (el) {
+                    el.play().catch(error => {
+                      console.log("Autoplay prevented:", error);
+                      // Attempt to play again on first user interaction
+                      document.body.addEventListener('touchstart', () => {
+                        el.play().catch(e => console.log("Still can't play:", e));
+                      }, { once: true });
+                    });
+                  }
+                }}
               ></video>
             </div>
           </div>

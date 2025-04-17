@@ -190,7 +190,7 @@ const About = () => {
             deviceType === "desktop"
               ? "calc(100vh - 62px)"
               : "calc(100vh - 66px)",
-          backgroundImage: `url('/hero-banner-about.png')`,
+          backgroundImage: `url('/hero-banner-about.jpg')`,
           backgroundSize: deviceType === "desktop" ? "100% auto" : "auto 100%",
           backgroundPosition: `center 0px`,
           backgroundRepeat: "no-repeat",
