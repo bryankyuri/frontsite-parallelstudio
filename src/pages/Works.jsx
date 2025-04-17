@@ -221,7 +221,7 @@ const Works = () => {
         </motion.div>
 
         <FadeInSection delay={0.3}>
-          <div className="px-5 w-full mb-[155px]">
+          <div className="w-full mb-[155px]">
             <div className="mt-[122px] text-left max-w-[574px] lg:text-[24px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
               HAVE A PROJECT IN MIND? LET'S GET TO WORK.
               <br />
