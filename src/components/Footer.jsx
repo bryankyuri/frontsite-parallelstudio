@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 
 const Footer = ({ deviceType }) => {
   return (
-    <footer className="pt-10">
-      <div className="w-full mx-auto px-5 flex lg:flex-row flex-col items-start justify-between text-black">
+    <footer className="px-5">
+      <div className="w-full mx-auto lg:pt-5 lg:border-t lg:border-black flex lg:flex-row flex-col items-start justify-between text-black">
         <div className="w-full">
           <img
             className=" invert"
@@ -36,32 +36,37 @@ const Footer = ({ deviceType }) => {
           <div className="flex">
             <div className="mr-[83px] font-semibold">M</div>
             <div>
-              <span className="mr-6">+62</span>
-              <span>812 8626 3544</span>
+              <span>INFO@PARALLEL.ASIA</span>
             </div>
           </div>
         </div>
         <div className="w-full">
           <div className="font-semibold mb-10 lg:mt-0 mt-10">SOCIAL</div>
           <div className="flex flex-col">
-            <Link
-              to="#"
+            <a
+              href="https://www.instagram.com/parallel__studio//"
+              target="_blank"
+              rel="noopener noreferrer"
               className="lg:border-none border-t border-black lg:py-0 py-2"
             >
               INSTAGRAM
-            </Link>
-            <Link
-              to="#"
+            </a>
+            <a
+              href="https://www.youtube.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="lg:border-none border-t border-black lg:py-0 py-2"
             >
               YOUTUBE
-            </Link>
-            <Link
-              to="#"
+            </a>
+            <a
+              href="https://www.vimeo.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="lg:border-none border-t border-black lg:py-0 py-2"
             >
               VIMEO
-            </Link>
+            </a>
           </div>
         </div>
         <div className="w-[70%] text-right">
@@ -69,14 +74,14 @@ const Footer = ({ deviceType }) => {
         </div>
       </div>
       {deviceType === "desktop" ? (
-        <div className="w-full flex justify-between p-5 text-[10px] font-semibold text-black mt-[117px]">
+        <div className="w-full flex justify-between py-5 text-[10px] font-semibold text-black mt-[117px]">
           <div className="w-full">©2024</div>
           <div className="w-full">SITE BY PLAYGROUND STUDIO</div>
           <div className="w-full"></div>
           <div className="w-[70%] text-right">THE HAGUE, THE NETHERLANDS</div>
         </div>
       ) : (
-        <div className="w-full flex justify-between p-5 text-[10px] font-semibold text-black mt-[227px]">
+        <div className="w-full flex justify-between py-5 text-[10px] font-semibold text-black mt-[227px]">
           <div className="text-left">
             ©2024
             <br />

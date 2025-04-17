@@ -59,7 +59,7 @@ const Navigation = ({ deviceType }) => {
         <>
           <header className={`bg-white fixed z-50 w-full text-black`}>
             <nav className="container mx-auto py-4 px-[20px] flex justify-between items-center">
-              <Link to="/">
+              <Link to="/" onClick={() => setMobileMenuOpen(false)}>
                 <img
                   className=" invert"
                   src="/logo.png"
