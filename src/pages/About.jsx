@@ -329,7 +329,7 @@ const About = () => {
       <FadeInSection delay={0.3}>
         <section className="services py-20" id="send-portofolio">
           <div className="w-full px-5 flex flex-col lg:flex-row lg:items-start lg:justify-between">
-            <div className="w-full">
+            <div className="lg:w-[80%] w-full">
               <button className="w-[246px] h-[51px] flex justify-center items-center border bg-black border-black  text-white hover:bg-white hover:border-black  hover:text-black font-semibold rounded mb-10 transition-all duration-[0.3s]">
                 SEND US YOUR PORTFOLIO
               </button>
@@ -355,6 +355,7 @@ const About = () => {
                 )}
               </div>
             </div>
+            <div className="h-[16px] w-[16px]"></div>
           </div>
         </section>
       </FadeInSection>
