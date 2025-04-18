@@ -8,35 +8,44 @@ import WorkDetail from '../pages/WorkDetail';
 import Contact from '../pages/Contact';
 import NotFound from '../pages/NotFound';
 import { ScrollToTop } from '../components/ScrollToTop';
+import { RouterProgress } from '../components/RouterProgress';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <ScrollToTop>
-        <Layout />
-      </ScrollToTop>
+      <>
+        <RouterProgress />
+        <ScrollToTop>
+          <Layout />
+        </ScrollToTop>
+      </>
     ),
     children: [
       {
         index: true,
-        element: <Home />
+        element: <Home />,
+        loader: () => null
       },
       {
         path: 'about',
-        element: <About />
+        element: <About />,
+        loader: () => null
       },
       {
         path: 'works',
-        element: <Works />
+        element: <Works />,
+        loader: () => null
       },
       {
         path: 'works/:workId',
-        element: <WorkDetail />
+        element: <WorkDetail />,
+        loader: ({ params }) => params || null
       },
       {
         path: 'contact',
-        element: <Contact />
+        element: <Contact />,
+        loader: () => null
       },
       {
         path: '*',

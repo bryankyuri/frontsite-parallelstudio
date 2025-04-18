@@ -3,6 +3,7 @@ import Navigation from "./Navigation";
 import Footer from "./Footer";
 import { AppContext } from "../context/AppContext";
 import { useContext } from "react";
+import { PageTransition } from "./PageTransition";
 
 const Layout = () => {
   const { deviceType } = useContext(AppContext);
@@ -10,7 +11,9 @@ const Layout = () => {
     <div className="flex min-h-screen flex-col">
       <Navigation deviceType={deviceType} />
       <main className="flex-1 mt-[66px] lg:mt-[62px]">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer deviceType={deviceType} />
     </div>
