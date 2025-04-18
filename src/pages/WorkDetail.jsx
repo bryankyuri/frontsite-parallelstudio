@@ -70,6 +70,7 @@ const WorkDetail = () => {
     id: workId,
     title: "Video Title",
     client: "Client Name",
+    year: "2024",
     credits: [
       { role: "Director", name: "Your Name" },
       { role: "Producer", name: "Your Name" },
@@ -279,9 +280,50 @@ const WorkDetail = () => {
           ))}
         </div>
 
+        <div className="w-full lg:text-[24px] text-[14px] text-black mx-auto px-5 flex mt-20 mb-20 lg:mb-5 lg:justify-end lg:flex-row flex-col-reverse border-b ">
+          <div className="w-full lg:border-b border-black"></div>
+          <div className="w-full  border-t lg:border-t-0 border-b border-black">
+            <div className="w-full flex border-b border-black py-2 lg:py-5">
+              <div className="w-[35%]">CLIENT</div>
+              <div className="w-full font-medium">{work.client}</div>
+            </div>
+            <div className="w-full flex border-b border-black py-2 lg:py-5 ">
+              <div className="w-[35%]">TITLE</div>
+              <div className="w-full font-medium">
+                <div
+                  className="border-b border-black pb-2 lg:pb-5 
+                  lg:min-h-[91px] min-h-[71px]"
+                >
+                  {work.title}
+                </div>
+                <div className="pt-2 lg:pt-5">{work.year}</div>
+              </div>
+            </div>
+            <div className="w-full flex  py-2 lg:py-5 ">
+              <div className="w-[35%]">CREDITS</div>
+              <div className="w-full font-medium">
+                {work.credits.map((creditsItem, index) => (
+                  <div
+                    className={`${
+                      work.credits.length - 1 !== index
+                        ? "border-b border-black pb-2 lg:pb-5 mb-2 lg:mb-5"
+                        : ""
+                    }   grid grid-cols-2 gap-2`}
+                  >
+                    <div className="w-full">{creditsItem.name}</div>
+                    <div className="w-full">{creditsItem.role}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* More Works */}
         <div className="mb-16 px-5">
-          <h2 className="font-bold text-left mb-10 text-black">MORE WORKS</h2>
+          <h2 className="text-[24px] font-bold text-left mb-10 text-black">
+            MORE WORKS
+          </h2>
           <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
             {work.relatedWorks.map((work) => (
               <Link to={`/works/${work.id}`} className={stylesWork.workItem}>
