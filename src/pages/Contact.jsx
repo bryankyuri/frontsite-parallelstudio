@@ -48,7 +48,7 @@ const Contact = () => {
         )}
       </div>
       <div
-        className={`w-full bg-black text-white py-32 relative ${styles.heroBanner} flex lg:justify-center lg:items-center justify-start items-end`}
+        className={`w-full bg-black text-white py-32 relative ${styles.heroBanner} flex lg:justify-center lg:items-center justify-start items-end mb-[140px] lg:mb-[420px]`}
         style={{
           height:
             deviceType === "desktop"
@@ -61,6 +61,35 @@ const Contact = () => {
           backgroundRepeat: "no-repeat",
         }}
       ></div>
+      <div className=" w-full px-5 mb-[148px] lg:mb-0">
+        <div className="lg:w-1/2 w-full">
+          <div className="lg:text-[24px] text-[16px] font-semibold text-black mb-10">
+            SEND A MESSAGE
+          </div>
+          <div className="grid lg:grid-cols-2 lg:gap-5 grid-cols-1">
+            <input
+              className="outline-none border-b border-black pb-2 mb-2 text-[14px] lg:text-[16px] text-black"
+              placeholder="NAME"
+            />
+            <input
+              className="outline-none border-b border-black pb-2 mb-2 text-[14px] lg:text-[16px] text-black"
+              placeholder="EMAIL"
+            />
+          </div>
+          <div className="w-full lg:pt-[50px] pb-2 border-b border-black ">
+            <textarea
+              className="w-full outline-none  text-[14px] lg:text-[16px] text-black h-[179px] overflow-auto"
+              placeholder="MESSAGE"
+            />
+          </div>
+          <div className="w-full lg:py-5 py-2 border-b border-black lg:border-none">
+            <button className="w-full text-[14px] lg:text-[16px] outline-none font-bold text-black text-left">
+              SUBMIT
+            </button>
+            <div />
+          </div>
+        </div>
+      </div>
       {/* <div className="container mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold mb-8">Contact Us</h1>
         

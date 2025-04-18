@@ -232,7 +232,7 @@ const Home = () => {
         <FadeInSection delay={0.3}>
           <div id="latest-projects" className="px-5">
             {/* Header */}
-            <h2 className="font-bold text-left mb-10 text-black">
+            <h2 className="lg:text-[24px] text-[16px] font-bold text-left mb-10 text-black">
               LATEST PROJECT
             </h2>
 

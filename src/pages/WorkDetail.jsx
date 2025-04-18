@@ -8,6 +8,7 @@ import {
   ReactCompareSliderImage,
 } from "react-compare-slider";
 import { IconMoveToCenter } from "../components/Icon/MoveToCenter";
+import { FadeInSection } from "../components/FadeInSection";
 
 const WorkDetail = () => {
   const { workId } = useParams();
@@ -275,7 +276,9 @@ const WorkDetail = () => {
         <div className="w-full mx-auto lg:px-5">
           {work.images.map((image) => (
             <div key={image.id} className="lg:mb-5 mb-[10px]">
-              {renderImage(image.type, image.imageUrl)}
+              <FadeInSection delay={0.3}>
+                {renderImage(image.type, image.imageUrl)}
+              </FadeInSection>
             </div>
           ))}
         </div>
@@ -283,64 +286,74 @@ const WorkDetail = () => {
         <div className="w-full lg:text-[24px] text-[14px] text-black mx-auto px-5 flex mt-20 mb-20 lg:mb-5 lg:justify-end lg:flex-row flex-col-reverse border-b ">
           <div className="w-full lg:border-b border-black"></div>
           <div className="w-full  border-t lg:border-t-0 border-b border-black">
-            <div className="w-full flex border-b border-black py-2 lg:py-5">
-              <div className="w-[35%]">CLIENT</div>
-              <div className="w-full font-medium">{work.client}</div>
-            </div>
-            <div className="w-full flex border-b border-black py-2 lg:py-5 ">
-              <div className="w-[35%]">TITLE</div>
-              <div className="w-full font-medium">
-                <div
-                  className="border-b border-black pb-2 lg:pb-5 
-                  lg:min-h-[91px] min-h-[71px]"
-                >
-                  {work.title}
-                </div>
-                <div className="pt-2 lg:pt-5">{work.year}</div>
+            <FadeInSection delay={0.3}>
+              <div className="w-full flex border-b border-black py-2 lg:py-5">
+                <div className="w-[35%]">CLIENT</div>
+                <div className="w-full font-medium">{work.client}</div>
               </div>
-            </div>
-            <div className="w-full flex  py-2 lg:py-5 ">
-              <div className="w-[35%]">CREDITS</div>
-              <div className="w-full font-medium">
-                {work.credits.map((creditsItem, index) => (
+            </FadeInSection>
+            <FadeInSection delay={0.3}>
+              <div className="w-full flex border-b border-black py-2 lg:py-5 ">
+                <div className="w-[35%]">TITLE</div>
+                <div className="w-full font-medium">
                   <div
-                    className={`${
-                      work.credits.length - 1 !== index
-                        ? "border-b border-black pb-2 lg:pb-5 mb-2 lg:mb-5"
-                        : ""
-                    }   grid grid-cols-2 gap-2`}
+                    className="border-b border-black pb-2 lg:pb-5 
+                  lg:min-h-[91px] min-h-[71px]"
                   >
-                    <div className="w-full">{creditsItem.name}</div>
-                    <div className="w-full">{creditsItem.role}</div>
+                    {work.title}
                   </div>
-                ))}
+                  <div className="pt-2 lg:pt-5">{work.year}</div>
+                </div>
               </div>
-            </div>
+            </FadeInSection>
+            <FadeInSection delay={0.3}>
+              <div className="w-full flex  py-2 lg:py-5 ">
+                <div className="w-[35%]">CREDITS</div>
+                <div className="w-full font-medium">
+                  {work.credits.map((creditsItem, index) => (
+                    <div
+                      className={`${
+                        work.credits.length - 1 !== index
+                          ? "border-b border-black pb-2 lg:pb-5 mb-2 lg:mb-5"
+                          : ""
+                      }   grid grid-cols-2 gap-2`}
+                    >
+                      <div className="w-full">{creditsItem.name}</div>
+                      <div className="w-full">{creditsItem.role}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeInSection>
           </div>
         </div>
 
         {/* More Works */}
-        <div className="mb-16 px-5">
-          <h2 className="text-[24px] font-bold text-left mb-10 text-black">
-            MORE WORKS
-          </h2>
+        <div className="mb-20 lg:mb-40 px-5">
+          <FadeInSection delay={0.3}>
+            <h2 className="lg:text-[24px] text-[16px] font-bold text-left mb-10 text-black">
+              MORE WORKS
+            </h2>
+          </FadeInSection>
           <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
-            {work.relatedWorks.map((work) => (
+            {work.relatedWorks.map((work, index) => (
               <Link to={`/works/${work.id}`} className={stylesWork.workItem}>
-                <div className="overflow-hidden">
-                  <img
-                    src={work.imageUrl}
-                    alt={work.title}
-                    className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
-                  />
-                  <div className="mt-[20px] flex justify-between">
-                    <div className="text-black">
-                      <span>{work.title}</span>
-                      <span> | {work.client}</span>
+                <FadeInSection delay={0.3 + (index + 1) * 0.1}>
+                  <div className="overflow-hidden">
+                    <img
+                      src={work.imageUrl}
+                      alt={work.title}
+                      className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                    />
+                    <div className="mt-[20px] flex justify-between">
+                      <div className="text-black">
+                        <span>{work.title}</span>
+                        <span> | {work.client}</span>
+                      </div>
+                      <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>
-                    <div className="text-[#B4B4B4]">{work.category}</div>
                   </div>
-                </div>
+                </FadeInSection>
               </Link>
             ))}
           </div>

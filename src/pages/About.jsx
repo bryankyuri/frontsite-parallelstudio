@@ -245,7 +245,7 @@ const About = () => {
       <section className="services py-20" id="our-services">
         <div className="w-full px-5">
           <FadeInSection delay={0.3}>
-            <h2 className="text-[24px] font-bold pb-20 text-black">
+            <h2 className="lg:text-[24px] text-[16px] font-bold pb-20 text-black">
               OUR SERVICES
             </h2>
           </FadeInSection>
@@ -301,7 +301,7 @@ const About = () => {
       <section className="services py-20" id="our-services">
         <div className="w-full px-5">
           <FadeInSection delay={0.3}>
-            <h2 className="text-[24px] font-bold mb-5 text-black">OUR TEAM</h2>
+            <h2 className="lg:text-[24px] text-[16px] font-bold mb-5 text-black">OUR TEAM</h2>
           </FadeInSection>
           <div className="grid lg:grid-cols-4 grid-cols-2 gap-5">
             {team.map((member) => (
