@@ -1,12 +1,70 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import styles from "../styles/WorkDetail.module.scss";
 import stylesWork from "../styles/Works.module.scss";
 import { AppContext } from "../context/AppContext";
+import {
+  ReactCompareSlider,
+  ReactCompareSliderImage,
+} from "react-compare-slider";
+import { IconMoveToCenter } from "../components/Icon/MoveToCenter";
 
 const WorkDetail = () => {
   const { workId } = useParams();
   const { deviceType } = useContext(AppContext);
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const animationRef = useRef(null);
+
+  // Animation function for smooth slider transitions
+  const animateSlider = (targetPosition) => {
+    setIsAnimating(true);
+    const startPosition = sliderPosition;
+    const duration = 600; // animation duration in milliseconds
+    const startTime = performance.now();
+
+    // Cancel any ongoing animation
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+
+    // Animation function
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Easing function for smoother animation
+      const easeInOutCubic = (progress) =>
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      const newPosition =
+        startPosition +
+        (targetPosition - startPosition) * easeInOutCubic(progress);
+
+      setSliderPosition(newPosition);
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      } else {
+        setSliderPosition(targetPosition);
+        setIsAnimating(false);
+        animationRef.current = null;
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+  };
+
+  // Clean up animation on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
+
   // Mock data - in a real app, you would fetch this based on the workId
   const work = {
     id: workId,
@@ -21,16 +79,48 @@ const WorkDetail = () => {
       { role: "Motion Graphic", name: "Your Name" },
     ],
     images: [
-      "/path-to-image-1.jpg",
-      "/path-to-image-2.jpg",
-      "/path-to-image-3.jpg",
-      "/path-to-image-4.jpg",
-      "/path-to-image-5.jpg",
-      "/path-to-image-6.jpg",
-      "/path-to-image-7.jpg",
-      "/path-to-image-8.jpg",
-      "/path-to-image-9.jpg",
-      "/path-to-image-10.jpg",
+      {
+        id: "01",
+        type: "full-width",
+        imageUrl: "/assets/workDetail/work1.jpg",
+      },
+      {
+        id: "02",
+        type: "2col-full",
+        imageUrl: [
+          "/assets/workDetail/work2.jpg",
+          "/assets/workDetail/work3.jpg",
+        ],
+      },
+      {
+        id: "03",
+        type: "2col-full",
+        imageUrl: [
+          "/assets/workDetail/work4.jpg",
+          "/assets/workDetail/work5.jpg",
+        ],
+      },
+      {
+        id: "04",
+        type: "compare-full",
+        imageUrl: [
+          "/assets/workDetail/work6B.jpg",
+          "/assets/workDetail/work6.jpg",
+        ],
+      },
+      {
+        id: "05",
+        type: "2col-4:5",
+        imageUrl: [
+          "/assets/workDetail/work7.jpg",
+          "/assets/workDetail/work8.jpg",
+        ],
+      },
+      {
+        id: "06",
+        type: "full-width",
+        imageUrl: "/assets/workDetail/work9.jpg",
+      },
     ],
     relatedWorks: [
       {
@@ -56,12 +146,116 @@ const WorkDetail = () => {
       },
     ],
   };
+  const renderImage = (type, imageUrl) => {
+    switch (type) {
+      case "full-width":
+        return (
+          <div className="w-full">
+            <img
+              src={imageUrl}
+              alt={work.title}
+              className="w-full object-cover"
+            />
+          </div>
+        );
+      case "2col-full":
+        return (
+          <div className="grid grid-cols-2 lg:gap-5 gap-[10px]">
+            {imageUrl.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={work.title}
+                className="w-full object-cover"
+              />
+            ))}
+          </div>
+        );
+      case "compare-full":
+        return (
+          <div className="w-full relative">
+            {/* Create a proper sticky container with background */}
+            <div className="sticky top-[62px] z-20 w-full bg-opacity-10 pt-4 px-4">
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => !isAnimating && animateSlider(100)}
+                  className="bg-black bg-opacity-70 text-white lg:px-3 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300"
+                  disabled={isAnimating}
+                >
+                  BEFORE
+                </button>
 
+                <button
+                  onClick={() => !isAnimating && animateSlider(50.25)}
+                  className="bg-black bg-opacity-70 text-white lg:px-2 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300 ml-auto"
+                  disabled={isAnimating}
+                >
+                  <IconMoveToCenter />
+                </button>
+
+                <button
+                  onClick={() => !isAnimating && animateSlider(0)}
+                  className="bg-black bg-opacity-70 text-white lg:px-3 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300 ml-auto"
+                  disabled={isAnimating}
+                >
+                  AFTER
+                </button>
+              </div>
+            </div>
+
+            {/* The compare slider below the sticky header */}
+            <div className="mt-[-40px]">
+              <ReactCompareSlider
+                itemOne={
+                  <ReactCompareSliderImage
+                    src={imageUrl[0]}
+                    alt="Before"
+                    className="w-full object-cover"
+                  />
+                }
+                itemTwo={
+                  <ReactCompareSliderImage
+                    src={imageUrl[1]}
+                    alt="After"
+                    className="w-full object-cover"
+                  />
+                }
+                position={sliderPosition}
+                onPositionChange={(position) => {
+                  if (!isAnimating) {
+                    setSliderPosition(position);
+                  }
+                }}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+              />
+            </div>
+          </div>
+        );
+      case "2col-4:5":
+        return (
+          <div className="grid grid-cols-2 lg:gap-5 gap-[10px]">
+            {imageUrl.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={work.title}
+                className="w-full object-cover"
+              />
+            ))}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
   return (
     <div className={styles.workDetail}>
       <div className="w-full mx-auto">
         <div
-          className={`w-full bg-black text-white relative ${styles.heroBanner}`}
+          className={`w-full bg-black text-white relative ${styles.heroBanner} lg:mb-5 mb-[10px]`}
           style={{
             height:
               deviceType === "desktop"
@@ -77,30 +271,12 @@ const WorkDetail = () => {
         ></div>
 
         {/* Project Details */}
-        <div className="mb-16">
-          {/* <div className="grid grid-cols-2 gap-8 border-t border-gray-200 py-4">
-            <div>
-              <span className="text-sm text-gray-500">CLIENT</span>
-              <p>{work.client}</p>
+        <div className="w-full mx-auto lg:px-5">
+          {work.images.map((image) => (
+            <div key={image.id} className="lg:mb-5 mb-[10px]">
+              {renderImage(image.type, image.imageUrl)}
             </div>
-            <div>
-              <span className="text-sm text-gray-500">TITLE</span>
-              <p>{work.title}</p>
-            </div>
-          </div> */}
-
-          {/* Credits */}
-          {/* <div className="border-t border-gray-200 py-4">
-            <span className="text-sm text-gray-500">CREDITS</span>
-            <div className="grid grid-cols-2 gap-8 mt-2">
-              {work.credits.map((credit, index) => (
-                <div key={index} className="flex justify-between">
-                  <span>{credit.name}</span>
-                  <span>{credit.role}</span>
-                </div>
-              ))}
-            </div>
-          </div> */}
+          ))}
         </div>
 
         {/* More Works */}
