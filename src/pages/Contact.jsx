@@ -5,34 +5,6 @@ import { FadeInSection } from "../components/FadeInSection";
 
 const Contact = () => {
   const { deviceType, vh } = useContext(AppContext);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
-    alert("Thank you for your message! We will get back to you soon.");
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
-  };
 
   return (
     <div className={styles.contact}>
@@ -68,7 +40,7 @@ const Contact = () => {
         ></div>
       </FadeInSection>
       <FadeInSection delay={0.3}>
-        <div className=" w-full px-5 mb-[148px] lg:mb-0">
+        <section className=" w-full px-5 mb-[148px] lg:mb-0" id="contact-form">
           <div className="lg:w-1/2 w-full">
             <div className="lg:text-[24px] text-[16px] font-semibold text-black mb-10">
               SEND A MESSAGE
@@ -96,7 +68,7 @@ const Contact = () => {
               <div />
             </div>
           </div>
-        </div>
+        </section>
       </FadeInSection>
 
     </div>

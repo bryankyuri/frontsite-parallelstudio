@@ -9,24 +9,23 @@ import { IconTriangle } from "../components/Icon/IconTriangle";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { FadeInSection } from "../components/FadeInSection";
+import { video } from "framer-motion/client";
 
 const Home = () => {
   const { vh, deviceType } = useContext(AppContext);
   // Default to null so no accordion is open by default
-  const [activeProject, setActiveProject] = useState(null);
+  const [activeProject, setActiveProject] = useState(0);
   // Track which project image to display (default to first)
   const [activeImage, setActiveImage] = useState(0);
-
-  // State to track scroll percentage
-  const [scrollPercentage, setScrollPercentage] = useState(0);
-
-  const projects = [
+  const [projects, setProjects] = useState([
     {
       id: 1,
       image: "/assets/works/work1.jpg", // Replace with your image path
       title: "PILLOW WALK",
       client: "ALDO",
       categories: ["COLOR GRADING", "REMOTE GRADING", "COMPUTER GRAPHIC"],
+      videoUrl: "https://cdn.jasonbradley.co/pic/6e1d7d78%20(1).mp4",
+      position: 0,
     },
     {
       id: 2,
@@ -34,6 +33,8 @@ const Home = () => {
       title: "TOKOPEDIA",
       client: "RAMADAN 2024",
       categories: ["MOTION GRAPHIC", "COMPUTER GRAPHIC"],
+      videoUrl: "https://cdn.jasonbradley.co/pic/cafd3e4d.mp4",
+      position: 0,
     },
     {
       id: 3,
@@ -41,6 +42,8 @@ const Home = () => {
       title: "TRUST IN GOLD",
       client: "UBS GOLD",
       categories: ["DRY HIRE", "REMOTE GRADING", "COMPUTER GRAPHIC"],
+      videoUrl: "https://cdn.jasonbradley.co/pic/1e50e423-e10aee53.mp4",
+      position: 0,
     },
     {
       id: 4,
@@ -48,8 +51,13 @@ const Home = () => {
       title: "SPEAK TO ME",
       client: "SOCIOLLA",
       categories: ["MOTION GRAPHIC", "COMPUTER GRAPHIC", "REMOTE GRADING"],
+      videoUrl: "https://cdn.jasonbradley.co/pic/3253312293.mp4",
+      position: 0,
     },
-  ];
+  ]);
+
+  // State to track scroll percentage
+  const [scrollPercentage, setScrollPercentage] = useState(0);
 
   const dataWorks = [
     {
@@ -105,7 +113,7 @@ const Home = () => {
             impactful way.                                `;
 
   // Combine and split the text into words
-  const words = aboutText.split(" ").filter(word => word.trim() !== "");
+  const words = aboutText.split(" ").filter((word) => word.trim() !== "");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -115,15 +123,16 @@ const Home = () => {
         const elementTop = rect.top;
         const elementHeight = rect.height;
         const windowHeight = window.innerHeight;
-        
+
         // Adjust trigger point to be earlier in the viewport
-        const triggerPoint = windowHeight * 0.8;
-        
+        const triggerPoint = windowHeight * 0.8; // 80% of viewport height
+
         let percentage = 0;
-        
+
         if (elementTop <= triggerPoint) {
           // Calculate percentage based on how far element has entered viewport
-          percentage = (triggerPoint - elementTop) / (triggerPoint + elementHeight);
+          percentage =
+            (triggerPoint - elementTop) / (triggerPoint + elementHeight);
           // Clamp value between 0 and 1
           percentage = Math.max(0, Math.min(1, percentage));
         }
@@ -134,14 +143,64 @@ const Home = () => {
 
     window.addEventListener("scroll", handleScroll);
     handleScroll(); // Initial calculation
-    
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Track animation states
+
+    return () => {};
+  }, [vh, activeProject, projects.length]);
+
+  const handleAccrodionClick = (index) => {
+    const tempDataProjects = [...projects];
+    const newDataProject = [];
+    if (tempDataProjects[index].position < 0) {
+      if (index === 0) {
+        tempDataProjects.map((project, i) => {
+          project.position = 0;
+          newDataProject.push(project);
+        });
+      } else {
+        tempDataProjects.map((project, i) => {
+          if (i <= index) {
+            newDataProject.push(project);
+          } else {
+            project.position = 0;
+            newDataProject.push(project);
+          }
+        });
+      }
+    } else {
+      tempDataProjects.map((project, i) => {
+        if (tempDataProjects[index].position < 0) {
+          console.log("test");
+          if (i <= index) {
+            newDataProject.push(project);
+          } else {
+            project.position = 0;
+            newDataProject.push(project);
+          }
+        } else {
+          if (i <= index) {
+            project.position = (vh - 202) * -1;
+            newDataProject.push(project);
+          } else {
+            newDataProject.push(project);
+          }
+        }
+      });
+    }
+    setProjects(newDataProject);
+  };
   return (
     <div className={styles.home}>
       <div className="w-full mx-auto px-0">
-        <div id="banner" className="relative h-[calc(100vh-62px)] ">
+        <div
+          id="banner"
+          className="relative h-[calc(100vh-62px)] overflow-hidden"
+        >
           <div className="sticky top-0 left-0 w-full h-[calc(100vh-62px)] overflow-hidden z-[1]">
             <div className="absolute top-0 left-0 w-full h-[calc(100vh-62px)]">
               <video
@@ -155,12 +214,18 @@ const Home = () => {
                 style={{ objectFit: "cover" }}
                 ref={(el) => {
                   if (el) {
-                    el.play().catch(error => {
+                    el.play().catch((error) => {
                       console.log("Autoplay prevented:", error);
                       // Attempt to play again on first user interaction
-                      document.body.addEventListener('touchstart', () => {
-                        el.play().catch(e => console.log("Still can't play:", e));
-                      }, { once: true });
+                      document.body.addEventListener(
+                        "touchstart",
+                        () => {
+                          el.play().catch((e) =>
+                            console.log("Still can't play:", e)
+                          );
+                        },
+                        { once: true }
+                      );
                     });
                   }
                 }}
@@ -169,37 +234,83 @@ const Home = () => {
           </div>
           <div
             id="projectContainer"
-            className="absolute top-0 left-0 w-full h-[calc(100vh-62px)] z-[1] flex flex-col justify-end"
+            className="absolute top-0 left-0 w-full h-[calc(100vh-62px)] z-[1] flex flex-col justify-end transition-all duration-700"
           >
-            {projects.map((project, index) => (
-              <div
-                id={`projectWrapper${index}`}
-                key={`project${index}`}
-                style={{ transform: "translate3d(0px, 0px, 0px)" }}
-                className="relative flex flex-col will-change-transform z-[1]"
-              >
-                <button
-                  className="relative px-5 py-2 text-[12px] text- text-black font-semibold overflow-hidden text-left z-[3] flex items-center justify-between border-b"
-                  style={{
-                    transform: "translate3d(0px, 0px, 0px)",
-                    background: "white",
-                  }}
-                >
-                  <div className="lg:w-[40%] w-full">{project.title}</div>
-                  {deviceType === "desktop" && (
-                    <>
-                      <div className="lg:w-[40%] w-full">{project.client}</div>
-                      <div className="lg:w-full w-[80%]">
-                        {project.categories}
+            {projects?.length > 0 && (
+              <>
+                {projects.map((project, index) => (
+                  <div
+                    id={`projectWrapper${index}`}
+                    key={`project${index}`}
+                    className="relative flex flex-col will-change-transform z-[1]"
+                    style={{
+                      transform: `translate3d(0px, ${project.position}px, 0px)`,
+                      transition: "transform 0.7s ease-in-out",
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        handleAccrodionClick(index);
+                      }}
+                      className="relative px-5 py-2 text-[12px] text- text-black font-semibold overflow-hidden text-left z-[3] flex items-center justify-between border-b"
+                      style={{
+                        transform: `translate3d(0px, 0px, 0px)`,
+                        background: "white",
+                      }}
+                    >
+                      <div className="lg:w-[40%] w-full">{project.title}</div>
+                      {deviceType === "desktop" && (
+                        <>
+                          <div className="lg:w-[40%] w-full">
+                            {project.client}
+                          </div>
+                          <div className="lg:w-full w-[80%]">
+                            {project.categories}
+                          </div>
+                        </>
+                      )}
+                      <div className="w-[17px] rotate-180">
+                        <IconTriangle />
                       </div>
-                    </>
-                  )}
-                  <div className="w-[17px] rotate-180">
-                    <IconTriangle />
+                    </button>
+                    <Link
+                      className="top-[35px] absolute z-0 w-full"
+                      style={{ height: "calc(100vh - 202px)" }}
+                    >
+                      <div className="w-full h-full relative overflow-hidden">
+                        <video
+                          src={project.videoUrl}
+                          loop
+                          muted
+                          playsInline
+                          autoPlay
+                          className="absolute w-full h-full top-0 left-0"
+                          data-critical=""
+                          style={{ objectFit: "cover" }}
+                          ref={(el) => {
+                            if (el) {
+                              el.play().catch((error) => {
+                                console.log("Autoplay prevented:", error);
+                                // Attempt to play again on first user interaction
+                                document.body.addEventListener(
+                                  "touchstart",
+                                  () => {
+                                    el.play().catch((e) =>
+                                      console.log("Still can't play:", e)
+                                    );
+                                  },
+                                  { once: true }
+                                );
+                              });
+                            }
+                          }}
+                        ></video>
+                      </div>
+                    </Link>
                   </div>
-                </button>
-              </div>
-            ))}
+                ))}
+              </>
+            )}
           </div>
         </div>
         <div
@@ -207,7 +318,10 @@ const Home = () => {
           className="px-5 pt-8 uppercase font-extrabold text-black text-[24px] leading-[30px] lg:text-[44px] lg:leading-[54px] lg:pb-[185px] pb-[140px]"
         >
           {words.map((word, index) => {
-            const delayFactor = deviceType  === "desktop" ? index / words.length * 0.5 : index / words.length * 0.8; // Adjusted delay factor
+            const delayFactor =
+              deviceType === "desktop"
+                ? (index / words.length) * 0.5
+                : (index / words.length) * 0.8; // Adjusted delay factor
             const shouldBeColored = scrollPercentage >= delayFactor;
 
             return (
@@ -295,15 +409,19 @@ const Home = () => {
           <div id="ShowReel" className="lg:mb-[160px] mb-20">
             <div
               className="relative w-full"
-              style={{ 
-                paddingBottom: deviceType === "desktop" ? "calc(56.25% - 62px)" : "calc(177.78% - 66px)" // 16:9 for desktop, 9:16 for mobile
+              style={{
+                paddingBottom:
+                  deviceType === "desktop"
+                    ? "calc(56.25% - 62px)"
+                    : "calc(177.78% - 66px)", // 16:9 for desktop, 9:16 for mobile
               }}
             >
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
-                src={deviceType === "desktop" 
-                  ? "https://www.youtube.com/embed/dQw4w9WgXcQ" // Regular YouTube video
-                  : "https://www.youtube.com/embed/K3GS-KFp5Yc" // YouTube Shorts video
+                src={
+                  deviceType === "desktop"
+                    ? "https://www.youtube.com/embed/dQw4w9WgXcQ" // Regular YouTube video
+                    : "https://www.youtube.com/embed/K3GS-KFp5Yc" // YouTube Shorts video
                 }
                 title="Showreel Video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
