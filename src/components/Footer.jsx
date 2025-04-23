@@ -27,14 +27,14 @@ const Footer = ({ deviceType }) => {
             <br />
           </div>
           <div className="flex">
-            <div className="mr-[87px] font-semibold">P</div>
+            <div className="mr-[87px]">P</div>
             <div>
               <span className="mr-6">+62</span>
               <span>812 8626 3544</span>
             </div>
           </div>
           <div className="flex">
-            <div className="mr-[83px] font-semibold">M</div>
+            <div className="mr-[83px]">M</div>
             <div>
               <span>INFO@PARALLEL.ASIA</span>
             </div>

@@ -29,7 +29,7 @@ const Navigation = ({ deviceType }) => {
               <NavLink
                 to="/about"
                 className={({ isActive }) =>
-                  isActive ? "font-bold" : "hover:font-medium"
+                  isActive ? "" : "hover:font-medium"
                 }
               >
                 About
@@ -38,7 +38,7 @@ const Navigation = ({ deviceType }) => {
               <NavLink
                 to="/works"
                 className={({ isActive }) =>
-                  isActive ? "font-bold" : "hover:font-medium"
+                  isActive ? "" : "hover:font-medium"
                 }
               >
                 Works
@@ -47,7 +47,7 @@ const Navigation = ({ deviceType }) => {
               <NavLink
                 to="/contact"
                 className={({ isActive }) =>
-                  isActive ? "font-bold" : "hover:font-medium"
+                  isActive ? "" : "hover:font-medium"
                 }
               >
                 Contact
@@ -106,7 +106,7 @@ const Navigation = ({ deviceType }) => {
                 to="/about"
                 className={({ isActive }) =>
                   `block py-3 border-b ${
-                    isActive ? "font-bold" : ""
+                    isActive ? "" : ""
                   }`
                 }
                 onClick={() => setMobileMenuOpen(false)}
@@ -118,7 +118,7 @@ const Navigation = ({ deviceType }) => {
                 to="/works"
                 className={({ isActive }) =>
                   `block py-3 border-b ${
-                    isActive ? "font-bold" : ""
+                    isActive ? "" : ""
                   }`
                 }
                 onClick={() => setMobileMenuOpen(false)}
@@ -130,7 +130,7 @@ const Navigation = ({ deviceType }) => {
                 to="/contact"
                 className={({ isActive }) =>
                   `block py-3 border-b ${
-                    isActive ? "font-bold" : ""
+                    isActive ? "" : ""
                   }`
                 }
                 onClick={() => setMobileMenuOpen(false)}

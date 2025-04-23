@@ -181,22 +181,15 @@ const Works = () => {
           </div>
         </FadeInSection>
 
-        <motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <AnimatePresence>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatePresence mode="wait">
             {filteredWorks.map((work, index) => (
               <motion.div
-                layout
                 key={work.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{
-                  duration: 0.5,
-                  layout: { type: "spring", stiffness: 200, damping: 25 },
-                }}
+                transition={{ duration: 0.4 }}
                 className="w-full"
               >
                 <Link to={`/works/${work.id}`} className={styles.workItem}>
@@ -209,7 +202,7 @@ const Works = () => {
                     <div className="mt-[20px] flex justify-between">
                       <div className="text-black">
                         <span>{work.title}</span>
-                        <span> | {work.client}</span>
+                        <span> I {work.client}</span>
                       </div>
                       <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>
@@ -218,7 +211,7 @@ const Works = () => {
               </motion.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
         <FadeInSection delay={0.3}>
           <div className="w-full mb-[155px]">

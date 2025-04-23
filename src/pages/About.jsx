@@ -10,7 +10,7 @@ const About = () => {
   const { deviceType } = useContext(AppContext);
   // Initialize with the first accordion open
   const [openAccordions, setOpenAccordions] = useState({ "01": true });
-  const [openAccordionsJob, setOpenAccordionsJob] = useState({ "01": true });
+  const [openAccordionsJob, setOpenAccordionsJob] = useState("01");
 
   const toggleAccordion = (id) => {
     setOpenAccordions((prev) => ({
@@ -19,10 +19,7 @@ const About = () => {
     }));
   };
   const toggleAccordionJob = (id) => {
-    setOpenAccordionsJob((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setOpenAccordionsJob(id);
   };
 
   const services = [
@@ -368,7 +365,7 @@ const About = () => {
                   <button
                     onClick={() => toggleAccordionJob(jobItem.id)}
                     className={`px-5 py-1 flex justify-between text-left items-center w-full transition-all duration-[0.3s] ${
-                      openAccordionsJob[jobItem.id]
+                      openAccordionsJob === jobItem.id
                         ? "bg-black text-white"
                         : "bg-white text-black"
                     }`}
@@ -385,7 +382,7 @@ const About = () => {
                     )}
                     <div
                       className={`h-[16px] w-[16px] flex justify-center items-center ${
-                        openAccordionsJob[jobItem.id] ? "invert rotate-180" : ""
+                        openAccordionsJob === jobItem.id ? "invert rotate-180" : ""
                       } transition-all duration-[0.3s]`}
                     >
                       <IconTriangle />
@@ -393,7 +390,7 @@ const About = () => {
                   </button>
 
                   <AnimatePresence>
-                    {openAccordionsJob[jobItem.id] && (
+                    {openAccordionsJob === jobItem.id && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}

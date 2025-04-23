@@ -174,34 +174,31 @@ const WorkDetail = () => {
           </div>
         );
       case "compare-full":
+        console.log(sliderPosition)
         return (
           <div className="w-full relative">
             {/* Create a proper sticky container with background */}
             <div className="sticky top-[62px] z-20 w-full bg-opacity-10 pt-4 px-4">
               <div className="flex justify-between items-center">
-                <button
-                  onClick={() => !isAnimating && animateSlider(100)}
-                  className="bg-black bg-opacity-70 text-white lg:px-3 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300"
-                  disabled={isAnimating}
-                >
-                  BEFORE
-                </button>
+                {sliderPosition !== 0 && (
+                  <button
+                    onClick={() => !isAnimating && animateSlider(100)}
+                    className="bg-black bg-opacity-70 text-white lg:px-3 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300"
+                    disabled={isAnimating}
+                  >
+                    BEFORE
+                  </button>
+                )}
 
-                <button
-                  onClick={() => !isAnimating && animateSlider(50.25)}
-                  className="bg-black bg-opacity-70 text-white lg:px-2 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300 ml-auto"
-                  disabled={isAnimating}
-                >
-                  <IconMoveToCenter />
-                </button>
-
-                <button
-                  onClick={() => !isAnimating && animateSlider(0)}
-                  className="bg-black bg-opacity-70 text-white lg:px-3 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300 ml-auto"
-                  disabled={isAnimating}
-                >
-                  AFTER
-                </button>
+                {sliderPosition < 99 && (
+                  <button
+                    onClick={() => !isAnimating && animateSlider(0)}
+                    className="bg-black bg-opacity-70 text-white lg:px-3 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300 ml-auto"
+                    disabled={isAnimating}
+                  >
+                    AFTER
+                  </button>
+                )}
               </div>
             </div>
 
@@ -232,6 +229,19 @@ const WorkDetail = () => {
                   height: "100%",
                   width: "100%",
                 }}
+                onlyHandleDraggable={true}
+                // handle={
+                //   <div
+                //     style={{
+                //       width: '40px',
+                //       height: '40px',
+                //       border: '3px solid white',
+                //       borderRadius: '50%',
+                //       backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                //       boxShadow: '0 0 5px rgba(0, 0, 0, 0.5)'
+                //     }}
+                //   />
+                // }
               />
             </div>
           </div>
@@ -348,7 +358,7 @@ const WorkDetail = () => {
                     <div className="mt-[20px] flex justify-between">
                       <div className="text-black">
                         <span>{work.title}</span>
-                        <span> | {work.client}</span>
+                        <span> I {work.client}</span>
                       </div>
                       <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>

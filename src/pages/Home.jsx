@@ -440,7 +440,9 @@ const Home = () => {
                 muted
                 playsInline
                 autoPlay
-                className={`absolute w-full h-full top-0 left-0 ${activeProject <= 0 ? "" : "hidden"}` }
+                className={`absolute w-full h-full top-0 left-0 ${
+                  activeProject <= 0 ? "" : "hidden"
+                }`}
                 data-critical=""
                 style={{ objectFit: "cover" }}
                 ref={(el) => {
@@ -473,7 +475,7 @@ const Home = () => {
                   <motion.div
                     id={`projectWrapper${index}`}
                     key={`project${index}`}
-                    className="relative flex flex-col will-change-transform z-[1]"
+                    className="relative flex flex-col will-change-transform z-[1] outline-none"
                     custom={index} // Pass index for staggered animations
                     variants={projectVariants}
                     animate={index <= activeProject ? "open" : "closed"}
@@ -484,8 +486,10 @@ const Home = () => {
                         handleAccrodionClick(index);
                       }}
                       className={`outline-none relative px-5 py-2 text-[12px] ${
-                        activeProject === index ? "text-white" : "text-black"
-                      } font-semibold overflow-hidden text-left z-[3] flex items-center justify-between border-b transition-all duration-[0.6s]`}
+                        activeProject === index
+                          ? "text-white border-transparent"
+                          : "text-black border-[#D2D2D2]"
+                      } font-semibold overflow-hidden text-left z-[3] flex items-center justify-between border-b  transition-all duration-[0.6s]`}
                       style={{
                         background: activeProject === index ? "black" : "white",
                       }}
@@ -511,7 +515,7 @@ const Home = () => {
                     </button>
                     <Link
                       to={`/works/${project.id}`}
-                      className="top-[35px] absolute z-0 w-full"
+                      className="top-[35px] absolute z-0 w-full outline-none"
                       style={{ height: "calc(100vh - 202px)" }}
                     >
                       <div
@@ -520,41 +524,16 @@ const Home = () => {
                         onMouseEnter={() => setHoveredProject(index)}
                         onMouseLeave={() => setHoveredProject(null)}
                       >
-                        {deviceType !== "desktop" && (
-                          <div
-                            className="absolute pointer-events-none z-[15] flex items-center justify-center"
-                            style={{
-                              left: "50%",
-                              top: "50%",
-                              transform: "translate(-50%, -50%)",
-                              width: "200px",
-                              height: "120px",
-                              borderRadius: "50%",
-                              mixBlendMode: "difference",
-                              fontWeight: "bold",
-                              color: "white",
-                              overflow: "hidden",
-                            }}
-                          >
-                            <div className="marquee-container overflow-hidden w-[80%]">
-                              <div className="marquee-text whitespace-nowrap animate-marquee">
-                                {project?.title} •{" "}
-                                {project?.client} •{" "}
-                                {project?.title} •{" "}
-                                {project?.client} •{" "}
-                              </div>
-                            </div>
-                          </div>
-                        )}
                         <video
                           src={project.videoUrl}
                           loop
                           muted
                           playsInline
                           autoPlay
-                          className="absolute w-full h-full top-0 left-0"
+                          className="absolute w-full h-full top-0 left-0 outline-none"
                           data-critical=""
                           style={{ objectFit: "cover" }}
+                          allowFullScreen="false"
                           ref={(el) => {
                             if (el) {
                               el.play().catch((error) => {
@@ -631,7 +610,7 @@ const Home = () => {
                     <div className="mt-[20px] flex justify-between">
                       <div className="text-black">
                         <span>{work.title}</span>
-                        <span> | {work.client}</span>
+                        <span> I {work.client}</span>
                       </div>
                       <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>
@@ -653,7 +632,7 @@ const Home = () => {
                     <div className="mt-[20px] flex justify-between">
                       <div className="text-black">
                         <span>{work.title}</span>
-                        <span> | {work.client}</span>
+                        <span> I {work.client}</span>
                       </div>
                       <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>
