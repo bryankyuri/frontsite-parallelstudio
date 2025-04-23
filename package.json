@@ -9,6 +9,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@studio-freight/lenis": "^1.0.42",
     "autoprefixer": "^10.4.14",
     "framer-motion": "^12.7.3",
     "nprogress": "^0.2.0",

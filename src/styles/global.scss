@@ -14,6 +14,8 @@
 }
 html {
   scrollbar-width: none;
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
 }
 
 body {
