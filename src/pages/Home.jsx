@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from "react";
 import { useQuery } from "react-query";
 import { fetchData } from "../api/index";
 import { motion, useAnimation } from "framer-motion";
@@ -10,13 +16,16 @@ import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { FadeInSection } from "../components/FadeInSection";
 import { video } from "framer-motion/client";
+import { debounce } from "lodash";
 
 const Home = () => {
   const { vh, deviceType } = useContext(AppContext);
   // Default to null so no accordion is open by default
-  const [activeProject, setActiveProject] = useState(0);
+  const [activeProject, setActiveProject] = useState(-1);
   // Track which project image to display (default to first)
   const [activeImage, setActiveImage] = useState(0);
+  const [scrollDirection, setScrollDirection] = useState(null);
+  const [isWindowLocked, setIsWindowLocked] = useState(true);
   const [projects, setProjects] = useState([
     {
       id: 1,
@@ -97,11 +106,6 @@ const Home = () => {
     },
   ];
 
-  // Function to change displayed image
-  const changeImage = (index) => {
-    setActiveImage(index);
-  };
-
   // Process text to wrap each word in a span with animation styles
   const aboutText = `We are an independent post-production house trusted by our
             collaborator to help tell incredible stories. Specializing in color
@@ -147,53 +151,198 @@ const Home = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    // Track animation states
+  // Create debounced handlers using useRef for stable references
+  const handleWheel = useCallback(
+    debounce((event) => {
+      const windowScroll = window.scrollY;
+      const direction = event.deltaY > 0 ? "down" : "up";
+      if (direction === "down") {
+        if (activeProject === projects.length - 1) {
+          setIsWindowLocked(false);
+        } else {
+          handleAccrodionClick(activeProject + 1);
+        }
+      } else {
+        console.log("activeProject", activeProject, isWindowLocked);
+        if (activeProject === projects.length - 1) {
+          if (windowScroll === 0) {
+            console.log("test0");
+            if (isWindowLocked) {
+              handleAccrodionClick(activeProject - 1);
+            } else {
+              console.log("test1");
+              setIsWindowLocked(true);
+            }
+          }
+        } else {
+          console.log("test");
+          if (activeProject === 0) {
+            handleAccrodionClick(activeProject);
+          } else {
+            handleAccrodionClick(activeProject - 1);
+          }
+        }
+      }
+    }, 300), // 50ms debounce time
+    [activeProject, isWindowLocked]
+  );
 
-    return () => {};
-  }, [vh, activeProject, projects.length]);
+  const handleKeyDown = useCallback(
+    debounce((event) => {
+      const windowScroll = window.scrollY;
+      if (event.key === "ArrowUp") {
+        if (activeProject === projects.length - 1) {
+          if (windowScroll === 0) {
+            console.log("test0");
+            if (isWindowLocked) {
+              handleAccrodionClick(activeProject - 1);
+            } else {
+              console.log("test1");
+              setIsWindowLocked(true);
+            }
+          }
+        } else {
+          console.log("test");
+          if (activeProject === 0) {
+            handleAccrodionClick(activeProject);
+          } else {
+            handleAccrodionClick(activeProject - 1);
+          }
+        }
+      } else if (event.key === "ArrowDown") {
+        if (activeProject === projects.length - 1) {
+          setIsWindowLocked(false);
+        } else {
+          handleAccrodionClick(activeProject + 1);
+        }
+      }
+    }, 300), // 50ms debounce time
+    [activeProject, isWindowLocked]
+  );
+
+  // Add event listeners
+  useEffect(() => {
+    window.addEventListener("wheel", handleWheel);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleWheel, handleKeyDown, activeProject]);
+
+  useEffect(() => {
+    if (isWindowLocked) {
+      document.body.style.overflow = "hidden"; // Lock scrollbar
+    } else {
+      document.body.style.overflow = ""; // Unlock scrollbar
+    }
+  }, [isWindowLocked]);
 
   const handleAccrodionClick = (index) => {
     const tempDataProjects = [...projects];
-    const newDataProject = [];
-    if (tempDataProjects[index].position < 0) {
-      if (index === 0) {
-        tempDataProjects.map((project, i) => {
-          project.position = 0;
-          newDataProject.push(project);
-        });
-      } else {
-        tempDataProjects.map((project, i) => {
-          if (i <= index) {
-            newDataProject.push(project);
-          } else {
-            project.position = 0;
-            newDataProject.push(project);
-          }
-        });
-      }
-    } else {
+    let newDataProject = [];
+    // if (tempDataProjects[index].position < 0) {
+    //   if (index === 0) {
+    //     tempDataProjects.map((project, i) => {
+    //       project.position = 0;
+    //       newDataProject.push(project);
+    //     });
+    //   } else {
+    //     tempDataProjects.map((project, i) => {
+    //       if (i <= index) {
+    //         newDataProject.push(project);
+    //       } else {
+    //         project.position = 0;
+    //         newDataProject.push(project);
+    //       }
+    //     });
+    //   }
+    // } else {
+    //   tempDataProjects.map((project, i) => {
+    //     if (tempDataProjects[index].position < 0) {
+    //       console.log("test");
+    //       if (i <= index) {
+    //         newDataProject.push(project);
+    //       } else {
+    //         project.position = 0;
+    //         newDataProject.push(project);
+    //       }
+    //     } else {
+    //       if (i <= index) {
+    //         project.position = (vh - 202) * -1;
+    //         newDataProject.push(project);
+    //       } else {
+    //         newDataProject.push(project);
+    //       }
+    //     }
+    //   });
+    // }
+    // if (index === 0 && index === activeProject) {
+    //   setActiveProject(-1);
+    // } else {
+    //   setActiveProject(index);
+    // }
+    const isPositionOpen = tempDataProjects[index].position < 0;
+    if (isPositionOpen) {
       tempDataProjects.map((project, i) => {
-        if (tempDataProjects[index].position < 0) {
-          console.log("test");
-          if (i <= index) {
+        if (index === tempDataProjects.length - 1) {
+          if (i === index) {
+            project.position = 0;
             newDataProject.push(project);
           } else {
-            project.position = 0;
             newDataProject.push(project);
           }
         } else {
-          if (i <= index) {
-            project.position = (vh - 202) * -1;
-            newDataProject.push(project);
+          if (tempDataProjects[index + 1].position === 0) {
+            if (i >= index) {
+              project.position = 0;
+              newDataProject.push(project);
+            } else {
+              newDataProject.push(project);
+            }
           } else {
-            newDataProject.push(project);
+            if (i > index) {
+              project.position = 0;
+              newDataProject.push(project);
+            } else {
+              newDataProject.push(project);
+            }
           }
         }
       });
+      if (index === tempDataProjects.length - 1) {
+        setActiveProject(activeProject - 1);
+      } else {
+        if (tempDataProjects[index + 1].position === 0) {
+          setActiveProject(activeProject - 1);
+        } else {
+          setActiveProject(activeProject + 1);
+        }
+      }
+    } else {
+      tempDataProjects.map((project, i) => {
+        if (i <= index) {
+          project.position = (vh - 202) * -1;
+          newDataProject.push(project);
+        } else {
+          newDataProject.push(project);
+        }
+      });
+      setActiveProject(activeProject + 1);
+      if (activeProject + 1 === projects.length - 1) {
+        setIsWindowLocked(false);
+      }
+    }
+
+    if (!isWindowLocked) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setIsWindowLocked(true);
     }
     setProjects(newDataProject);
   };
+
+  console.log(scrollDirection, isWindowLocked, activeProject);
   return (
     <div className={styles.home}>
       <div className="w-full mx-auto px-0">
@@ -252,10 +401,12 @@ const Home = () => {
                       onClick={() => {
                         handleAccrodionClick(index);
                       }}
-                      className="relative px-5 py-2 text-[12px] text- text-black font-semibold overflow-hidden text-left z-[3] flex items-center justify-between border-b"
+                      className={`outline-none relative px-5 py-2 text-[12px] ${
+                        activeProject === index ? "text-white" : "text-black"
+                      } font-semibold overflow-hidden text-left z-[3] flex items-center justify-between border-b transition-all duration-[0.6s]`}
                       style={{
                         transform: `translate3d(0px, 0px, 0px)`,
-                        background: "white",
+                        background: activeProject === index ? "black" : "white",
                       }}
                     >
                       <div className="lg:w-[40%] w-full">{project.title}</div>
@@ -269,7 +420,7 @@ const Home = () => {
                           </div>
                         </>
                       )}
-                      <div className="w-[17px] rotate-180">
+                      <div className={`w-[17px] flex justify-center items-center transition-all duration-[0.3s] ${activeProject === index ? "invert ml-2" : "rotate-180"}`}>
                         <IconTriangle />
                       </div>
                     </button>
