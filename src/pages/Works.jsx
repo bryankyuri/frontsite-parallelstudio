@@ -129,7 +129,7 @@ const Works = () => {
 
   return (
     <div className={styles.works}>
-      <div className="container mx-auto px-4 py-16">
+      <div className="w-full mx-auto px-4 py-16">
         <FadeInSection>
           <h1 className="lg:text-[40px] text-[36px] text-black font-bold lg:mb-[80px] text-center">
             WORKS

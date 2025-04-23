@@ -14,7 +14,7 @@ const Navigation = ({ deviceType }) => {
         <header
           className={`bg-white fixed z-50 w-full text-black h-[62px] flex items-center`}
         >
-          <nav className="container mx-auto py-4 px-5 flex justify-between items-center">
+          <nav className="w-full mx-auto py-4 px-5 flex justify-between items-center">
             <Link to="/" className="text-xl font-bold">
               <img
                 className=" invert"
@@ -58,7 +58,7 @@ const Navigation = ({ deviceType }) => {
       ) : (
         <>
           <header className={`bg-white fixed z-50 w-full text-black`}>
-            <nav className="container mx-auto py-4 px-[20px] flex justify-between items-center">
+            <nav className="w-full mx-auto py-4 px-[20px] flex justify-between items-center">
               <Link to="/" onClick={() => setMobileMenuOpen(false)}>
                 <img
                   className=" invert"
@@ -101,7 +101,7 @@ const Navigation = ({ deviceType }) => {
             }`}
             style={{ top: "64px" }}
           >
-            <div className="container mx-auto px-[20px] pb-8 flex flex-col uppercase text-sm">
+            <div className="w-full mx-auto px-[20px] pb-8 flex flex-col uppercase text-sm">
               <NavLink
                 to="/about"
                 className={({ isActive }) =>

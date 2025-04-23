@@ -196,7 +196,7 @@ const About = () => {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="container mx-auto lg:text-center z-[2] relative lg:px-0 px-5 ">
+        <div className="w-full mx-auto lg:text-center z-[2] relative lg:px-0 px-5 ">
           <h1 className="lg:text-[40px] text-[36px] leading-[115%] font-bold">
             <FadeInSection delay={0.3}>
               {deviceType === "desktop" ? (
@@ -220,7 +220,7 @@ const About = () => {
       </section>
       <FadeInSection delay={0.3}>
         <section className="company-intro py-20">
-          <div className="container mx-auto px-6">
+          <div className="w-full mx-auto px-6">
             <p className="w-full lg:max-w-[670px] mx-auto lg:text-center text-justify px-[40px] lg:px-0 mb-[140px] lg:mt-[140px] mt-[90px] text-[#969696] lg:text-[16px] text-[14px] leading-[120%]">
               Founded in 2019, Parallel Studio is a Jakarta-based
               post-production company that specializes in delivering
