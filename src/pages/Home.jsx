@@ -224,7 +224,7 @@ const Home = () => {
           }
         }
       }
-    }, 300), // 50ms debounce time
+    }, 150), // 50ms debounce time
     [activeProject, isWindowLocked]
   );
 
@@ -257,7 +257,7 @@ const Home = () => {
           handleAccrodionClick(activeProject + 1);
         }
       }
-    }, 300), // 50ms debounce time
+    }, 150), // 50ms debounce time
     [activeProject, isWindowLocked]
   );
 
@@ -308,7 +308,7 @@ const Home = () => {
 
       // Reset the touch start position
       setTouchStartY(0);
-    }, 300),
+    }, 150),
     [activeProject, isWindowLocked, touchStartY, projects.length]
   );
 
@@ -403,15 +403,36 @@ const Home = () => {
     setProjects(newDataProject);
   };
 
+  // Add this near your other state variables
+  const projectVariants = {
+    open: (i) => ({
+      y: (vh - 202) * -1,
+      transition: {
+        type: "spring",
+        stiffness: 250,
+        damping: 42,
+        // delay: i * 0.05, // Slight stagger effect
+      },
+    }),
+    closed: {
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 250,
+        damping: 44,
+      },
+    },
+  };
+
   console.log(scrollDirection, isWindowLocked, activeProject);
   return (
     <div className={styles.home}>
       <div className="w-full mx-auto px-0">
         <div
           id="banner"
-          className="relative h-[calc(100vh-62px)] overflow-hidden"
+          className="relative h-[calc(100vh-62px)] overflow-hidden overscroll-y-none"
         >
-          <div className="sticky top-0 left-0 w-full h-[calc(100vh-62px)] overflow-hidden z-[1]">
+          <div className="sticky top-0 left-0 w-full h-[calc(100vh-62px)] overflow-hidden z-[1] overscroll-y-none">
             <div className="absolute top-0 left-0 w-full h-[calc(100vh-62px)]">
               <video
                 src="https://cdn.jasonbradley.co/pic/ff41675d.mp4"
@@ -419,7 +440,7 @@ const Home = () => {
                 muted
                 playsInline
                 autoPlay
-                className="absolute w-full h-full top-0 left-0"
+                className={`absolute w-full h-full top-0 left-0 ${activeProject <= 0 ? "" : "hidden"}` }
                 data-critical=""
                 style={{ objectFit: "cover" }}
                 ref={(el) => {
@@ -449,15 +470,14 @@ const Home = () => {
             {projects?.length > 0 && (
               <>
                 {projects.map((project, index) => (
-                  <div
+                  <motion.div
                     id={`projectWrapper${index}`}
                     key={`project${index}`}
                     className="relative flex flex-col will-change-transform z-[1]"
-                    style={{
-                      transform: `translate3d(0px, ${project.position}px, 0px)`,
-                      transition: "transform 0.7s ease-in-out",
-                      cursor: "none", // Hide default cursor
-                    }}
+                    custom={index} // Pass index for staggered animations
+                    variants={projectVariants}
+                    animate={index <= activeProject ? "open" : "closed"}
+                    style={{ cursor: "none" }}
                   >
                     <button
                       onClick={() => {
@@ -467,7 +487,6 @@ const Home = () => {
                         activeProject === index ? "text-white" : "text-black"
                       } font-semibold overflow-hidden text-left z-[3] flex items-center justify-between border-b transition-all duration-[0.6s]`}
                       style={{
-                        transform: `translate3d(0px, 0px, 0px)`,
                         background: activeProject === index ? "black" : "white",
                       }}
                     >
@@ -501,6 +520,32 @@ const Home = () => {
                         onMouseEnter={() => setHoveredProject(index)}
                         onMouseLeave={() => setHoveredProject(null)}
                       >
+                        {deviceType !== "desktop" && (
+                          <div
+                            className="absolute pointer-events-none z-[15] flex items-center justify-center"
+                            style={{
+                              left: "50%",
+                              top: "50%",
+                              transform: "translate(-50%, -50%)",
+                              width: "200px",
+                              height: "120px",
+                              borderRadius: "50%",
+                              mixBlendMode: "difference",
+                              fontWeight: "bold",
+                              color: "white",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div className="marquee-container overflow-hidden w-[80%]">
+                              <div className="marquee-text whitespace-nowrap animate-marquee">
+                                {project?.title} •{" "}
+                                {project?.client} •{" "}
+                                {project?.title} •{" "}
+                                {project?.client} •{" "}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         <video
                           src={project.videoUrl}
                           loop
@@ -530,7 +575,7 @@ const Home = () => {
                         ></video>
                       </div>
                     </Link>
-                  </div>
+                  </motion.div>
                 ))}
               </>
             )}
@@ -673,32 +718,35 @@ const Home = () => {
           </div>
         </FadeInSection>
       </div>
-      {hoveredProject !== null && deviceType === "desktop" && (
-        <div
-          className="fixed pointer-events-none z-[15] flex items-center justify-center"
-          style={{
-            left: mousePosition.x,
-            top: mousePosition.y,
-            transform: "translate(-50%, -50%)",
-            width: "200px",
-            height: "120px",
-            borderRadius: "50%",
-            mixBlendMode: "difference",
-            fontWeight: "bold",
-            color: "white",
-            overflow: "hidden",
-          }}
-        >
-          <div className="marquee-container overflow-hidden w-[80%]">
-            <div className="marquee-text whitespace-nowrap animate-marquee">
-              {projects[hoveredProject]?.title} •{" "}
-              {projects[hoveredProject]?.client} •{" "}
-              {projects[hoveredProject]?.title} •{" "}
-              {projects[hoveredProject]?.client} •{" "}
+      {isWindowLocked &&
+        activeProject > -1 &&
+        hoveredProject !== null &&
+        deviceType === "desktop" && (
+          <div
+            className="fixed pointer-events-none z-[15] flex items-center justify-center"
+            style={{
+              left: mousePosition.x,
+              top: mousePosition.y,
+              transform: "translate(-50%, -50%)",
+              width: "200px",
+              height: "120px",
+              borderRadius: "50%",
+              mixBlendMode: "difference",
+              fontWeight: "bold",
+              color: "white",
+              overflow: "hidden",
+            }}
+          >
+            <div className="marquee-container overflow-hidden w-[80%]">
+              <div className="marquee-text whitespace-nowrap animate-marquee">
+                {projects[hoveredProject]?.title} •{" "}
+                {projects[hoveredProject]?.client} •{" "}
+                {projects[hoveredProject]?.title} •{" "}
+                {projects[hoveredProject]?.client} •{" "}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };
