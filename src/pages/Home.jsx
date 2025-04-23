@@ -261,16 +261,71 @@ const Home = () => {
     [activeProject, isWindowLocked]
   );
 
+  // Add this state to track touch positions
+  const [touchStartY, setTouchStartY] = useState(0);
+
+  // Create touch handlers using useRef for stable references
+  const handleTouchStart = useCallback((event) => {
+    // Store the initial touch Y position
+    setTouchStartY(event.touches[0].clientY);
+  }, []);
+
+  const handleTouchMove = useCallback(
+    debounce((event) => {
+      // If no starting position recorded, exit
+      if (touchStartY === 0) return;
+
+      // Calculate direction based on touch delta
+      const touchEndY = event.touches[0].clientY;
+      const touchDelta = touchStartY - touchEndY;
+      const direction = touchDelta > 0 ? "down" : "up";
+      const windowScroll = window.scrollY;
+
+      // Use the same logic as handleWheel
+      if (direction === "down") {
+        if (activeProject === projects.length - 1) {
+          setIsWindowLocked(false);
+        } else {
+          handleAccrodionClick(activeProject + 1);
+        }
+      } else {
+        if (activeProject === projects.length - 1) {
+          if (windowScroll === 0) {
+            if (isWindowLocked) {
+              handleAccrodionClick(activeProject - 1);
+            } else {
+              setIsWindowLocked(true);
+            }
+          }
+        } else {
+          if (activeProject === 0) {
+            handleAccrodionClick(activeProject);
+          } else {
+            handleAccrodionClick(activeProject - 1);
+          }
+        }
+      }
+
+      // Reset the touch start position
+      setTouchStartY(0);
+    }, 300),
+    [activeProject, isWindowLocked, touchStartY, projects.length]
+  );
+
   // Add event listeners
   useEffect(() => {
     window.addEventListener("wheel", handleWheel);
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove);
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [handleWheel, handleKeyDown, activeProject]);
+  }, [handleWheel, handleKeyDown, handleTouchStart, handleTouchMove]);
 
   useEffect(() => {
     if (isWindowLocked) {
