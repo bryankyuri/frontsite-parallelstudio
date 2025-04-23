@@ -101,11 +101,11 @@ const Navigation = ({ deviceType }) => {
             }`}
             style={{ top: "64px" }}
           >
-            <div className="container mx-auto px-[10px] pb-8 flex flex-col uppercase text-sm">
+            <div className="container mx-auto px-[20px] pb-8 flex flex-col uppercase text-sm">
               <NavLink
                 to="/about"
                 className={({ isActive }) =>
-                  `block py-3 border-b border-gray-100 ${
+                  `block py-3 border-b ${
                     isActive ? "font-bold" : ""
                   }`
                 }
@@ -117,7 +117,7 @@ const Navigation = ({ deviceType }) => {
               <NavLink
                 to="/works"
                 className={({ isActive }) =>
-                  `block py-3 border-b border-gray-100 ${
+                  `block py-3 border-b ${
                     isActive ? "font-bold" : ""
                   }`
                 }
@@ -129,7 +129,7 @@ const Navigation = ({ deviceType }) => {
               <NavLink
                 to="/contact"
                 className={({ isActive }) =>
-                  `block py-3 border-b border-gray-100 ${
+                  `block py-3 border-b ${
                     isActive ? "font-bold" : ""
                   }`
                 }

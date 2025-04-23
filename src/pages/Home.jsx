@@ -237,6 +237,11 @@ const Home = () => {
     } else {
       document.body.style.overflow = ""; // Unlock scrollbar
     }
+    
+    // Cleanup function - runs when component unmounts or before effect reruns
+    return () => {
+      document.body.style.overflow = ""; // Reset scrollbar on unmount
+    };
   }, [isWindowLocked]);
 
   const handleAccrodionClick = (index) => {
