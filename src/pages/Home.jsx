@@ -673,34 +673,32 @@ const Home = () => {
           </div>
         </FadeInSection>
       </div>
-      {hoveredProject !== null &&
-        deviceType ===
-          "desktop"(
-            <div
-              className="fixed pointer-events-none z-[15] flex items-center justify-center"
-              style={{
-                left: mousePosition.x,
-                top: mousePosition.y,
-                transform: "translate(-50%, -50%)",
-                width: "200px",
-                height: "120px",
-                borderRadius: "50%",
-                mixBlendMode: "difference",
-                fontWeight: "bold",
-                color: "white",
-                overflow: "hidden",
-              }}
-            >
-              <div className="marquee-container overflow-hidden w-[80%]">
-                <div className="marquee-text whitespace-nowrap animate-marquee">
-                  {projects[hoveredProject]?.title} •{" "}
-                  {projects[hoveredProject]?.client} •{" "}
-                  {projects[hoveredProject]?.title} •{" "}
-                  {projects[hoveredProject]?.client} •{" "}
-                </div>
-              </div>
+      {hoveredProject !== null && deviceType === "desktop" && (
+        <div
+          className="fixed pointer-events-none z-[15] flex items-center justify-center"
+          style={{
+            left: mousePosition.x,
+            top: mousePosition.y,
+            transform: "translate(-50%, -50%)",
+            width: "200px",
+            height: "120px",
+            borderRadius: "50%",
+            mixBlendMode: "difference",
+            fontWeight: "bold",
+            color: "white",
+            overflow: "hidden",
+          }}
+        >
+          <div className="marquee-container overflow-hidden w-[80%]">
+            <div className="marquee-text whitespace-nowrap animate-marquee">
+              {projects[hoveredProject]?.title} •{" "}
+              {projects[hoveredProject]?.client} •{" "}
+              {projects[hoveredProject]?.title} •{" "}
+              {projects[hoveredProject]?.client} •{" "}
             </div>
-          )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
