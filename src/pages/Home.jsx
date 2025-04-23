@@ -119,6 +119,47 @@ const Home = () => {
   // Combine and split the text into words
   const words = aboutText.split(" ").filter((word) => word.trim() !== "");
 
+  // Add these state variables
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [hoveredProject, setHoveredProject] = useState(null);
+
+  // Add custom cursor styles
+  const customCursorStyles = `
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    
+    .animate-marquee {
+      display: inline-block;
+      animation: marquee 5s linear infinite;
+    }
+  `;
+
+  // Inject styles
+  useEffect(() => {
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = customCursorStyles;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
+  // Track mouse position
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       const element = document.getElementById("about-wording");
@@ -237,7 +278,7 @@ const Home = () => {
     } else {
       document.body.style.overflow = ""; // Unlock scrollbar
     }
-    
+
     // Cleanup function - runs when component unmounts or before effect reruns
     return () => {
       document.body.style.overflow = ""; // Reset scrollbar on unmount
@@ -247,47 +288,7 @@ const Home = () => {
   const handleAccrodionClick = (index) => {
     const tempDataProjects = [...projects];
     let newDataProject = [];
-    // if (tempDataProjects[index].position < 0) {
-    //   if (index === 0) {
-    //     tempDataProjects.map((project, i) => {
-    //       project.position = 0;
-    //       newDataProject.push(project);
-    //     });
-    //   } else {
-    //     tempDataProjects.map((project, i) => {
-    //       if (i <= index) {
-    //         newDataProject.push(project);
-    //       } else {
-    //         project.position = 0;
-    //         newDataProject.push(project);
-    //       }
-    //     });
-    //   }
-    // } else {
-    //   tempDataProjects.map((project, i) => {
-    //     if (tempDataProjects[index].position < 0) {
-    //       console.log("test");
-    //       if (i <= index) {
-    //         newDataProject.push(project);
-    //       } else {
-    //         project.position = 0;
-    //         newDataProject.push(project);
-    //       }
-    //     } else {
-    //       if (i <= index) {
-    //         project.position = (vh - 202) * -1;
-    //         newDataProject.push(project);
-    //       } else {
-    //         newDataProject.push(project);
-    //       }
-    //     }
-    //   });
-    // }
-    // if (index === 0 && index === activeProject) {
-    //   setActiveProject(-1);
-    // } else {
-    //   setActiveProject(index);
-    // }
+
     const isPositionOpen = tempDataProjects[index].position < 0;
     if (isPositionOpen) {
       tempDataProjects.map((project, i) => {
@@ -400,6 +401,7 @@ const Home = () => {
                     style={{
                       transform: `translate3d(0px, ${project.position}px, 0px)`,
                       transition: "transform 0.7s ease-in-out",
+                      cursor: "none", // Hide default cursor
                     }}
                   >
                     <button
@@ -425,7 +427,11 @@ const Home = () => {
                           </div>
                         </>
                       )}
-                      <div className={`w-[17px] flex justify-center items-center transition-all duration-[0.3s] ${activeProject === index ? "invert ml-2" : "rotate-180"}`}>
+                      <div
+                        className={`w-[17px] flex justify-center items-center transition-all duration-[0.3s] ${
+                          activeProject === index ? "invert" : "rotate-180"
+                        }`}
+                      >
                         <IconTriangle />
                       </div>
                     </button>
@@ -433,7 +439,12 @@ const Home = () => {
                       className="top-[35px] absolute z-0 w-full"
                       style={{ height: "calc(100vh - 202px)" }}
                     >
-                      <div className="w-full h-full relative overflow-hidden">
+                      <div
+                        className="w-full h-full relative overflow-hidden"
+                        id={`projectVideo${index}`}
+                        onMouseEnter={() => setHoveredProject(index)}
+                        onMouseLeave={() => setHoveredProject(null)}
+                      >
                         <video
                           src={project.videoUrl}
                           loop
@@ -606,6 +617,32 @@ const Home = () => {
           </div>
         </FadeInSection>
       </div>
+      {hoveredProject !== null && (
+        <div
+          className="fixed pointer-events-none z-[15] flex items-center justify-center"
+          style={{
+            left: mousePosition.x,
+            top: mousePosition.y,
+            transform: "translate(-50%, -50%)",
+            width: "200px",
+            height: "120px",
+            borderRadius: "50%",
+            mixBlendMode: "difference",
+            fontWeight: "bold",
+            color: "white",
+            overflow: "hidden",
+          }}
+        >
+          <div className="marquee-container overflow-hidden w-[80%]">
+            <div className="marquee-text whitespace-nowrap animate-marquee">
+              {projects[hoveredProject]?.title} •{" "}
+              {projects[hoveredProject]?.client} •{" "}
+              {projects[hoveredProject]?.title} •{" "}
+              {projects[hoveredProject]?.client} •{" "}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
