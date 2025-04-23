@@ -672,7 +672,7 @@ const Home = () => {
           </div>
         </FadeInSection>
       </div>
-      {hoveredProject !== null && (
+      {hoveredProject !== null && deviceType === "desktop" (
         <div
           className="fixed pointer-events-none z-[15] flex items-center justify-center"
           style={{
