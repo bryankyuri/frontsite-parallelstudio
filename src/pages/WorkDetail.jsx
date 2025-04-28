@@ -174,7 +174,7 @@ const WorkDetail = () => {
           </div>
         );
       case "compare-full":
-        console.log(sliderPosition)
+        console.log(sliderPosition);
         return (
           <div className="w-full relative">
             {/* Create a proper sticky container with background */}
@@ -293,7 +293,7 @@ const WorkDetail = () => {
           ))}
         </div>
 
-        <div className="w-full lg:text-[24px] text-[14px] text-black mx-auto px-5 flex mt-20 mb-20 lg:mb-5 lg:justify-end lg:flex-row flex-col-reverse border-b ">
+        <div className="w-full   lg:text-[20px] text-[14px] text-black mx-auto px-5 flex mt-20 mb-20 lg:mb-5 lg:justify-end lg:flex-row flex-col-reverse border-b ">
           <div className="w-full lg:border-b border-black"></div>
           <div className="w-full  border-t lg:border-t-0 border-b border-black">
             <FadeInSection delay={0.3}>
@@ -341,24 +341,28 @@ const WorkDetail = () => {
         {/* More Works */}
         <div className="mb-20 lg:mb-40 px-5">
           <FadeInSection delay={0.3}>
-            <h2 className="lg:text-[24px] text-[16px] font-bold text-left mb-10 text-black">
+            <h2 className="  lg:text-[20px] text-[16px] font-bold text-left mb-10 text-black">
               MORE WORKS
             </h2>
           </FadeInSection>
           <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
             {work.relatedWorks.map((work, index) => (
-              <Link to={`/works/${work.id}`} className={stylesWork.workItem}>
+              <Link to={`/works/${work.id}`} className="workItem">
                 <FadeInSection delay={0.3 + (index + 1) * 0.1}>
                   <div className="overflow-hidden">
-                    <img
-                      src={work.imageUrl}
-                      alt={work.title}
-                      className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
-                    />
-                    <div className="mt-[20px] flex justify-between">
+                    <div className="overflow-hidden">
+                      <img
+                        src={work.imageUrl}
+                        alt={work.title}
+                        className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                      />
+                    </div>
+                    <div className="mt-[20px] flex justify-between workInfo">
                       <div className="text-black">
-                        <span>{work.title}</span>
-                        <span> I {work.client}</span>
+                        <span className="pre">I</span>
+                        <span className="workTitle">{work.title}</span>
+                        <span className="divider">&nbsp;I&nbsp;</span>
+                        <span>{work.client}</span>
                       </div>
                       <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>

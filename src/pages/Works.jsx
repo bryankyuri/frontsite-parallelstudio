@@ -192,17 +192,21 @@ const Works = () => {
                 transition={{ duration: 0.4 }}
                 className="w-full"
               >
-                <Link to={`/works/${work.id}`} className={styles.workItem}>
+                <Link to={`/works/${work.id}`} className="workItem">
                   <div className="overflow-hidden">
-                    <img
-                      src={work.imageUrl}
-                      alt={work.title}
-                      className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
-                    />
-                    <div className="mt-[20px] flex justify-between">
+                    <div className="overflow-hidden">
+                      <img
+                        src={work.imageUrl}
+                        alt={work.title}
+                        className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                      />
+                    </div>
+                    <div className="mt-[20px] flex justify-between workInfo">
                       <div className="text-black">
-                        <span>{work.title}</span>
-                        <span> I {work.client}</span>
+                        <span className="pre">I</span>
+                        <span className="workTitle">{work.title}</span>
+                        <span className="divider">&nbsp;I&nbsp;</span>
+                        <span>{work.client}</span>
                       </div>
                       <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>
@@ -215,7 +219,7 @@ const Works = () => {
 
         <FadeInSection delay={0.3}>
           <div className="w-full mb-[155px]">
-            <div className="mt-[122px] text-left max-w-[574px] lg:text-[24px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
+            <div className="mt-[122px] text-left max-w-[574px]   lg:text-[20px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
               HAVE A PROJECT IN MIND? LET'S GET TO WORK.
               <br />
               WE'RE ALWAYS OPEN FOR A CHAT,

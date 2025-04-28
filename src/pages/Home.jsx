@@ -593,24 +593,28 @@ const Home = () => {
         <FadeInSection delay={0.3}>
           <div id="latest-projects" className="px-5">
             {/* Header */}
-            <h2 className="lg:text-[24px] text-[16px] font-bold text-left mb-10 text-black">
+            <h2 className="  lg:text-[20px] text-[16px] font-bold text-left mb-10 text-black">
               LATEST PROJECT
             </h2>
 
             {/* First Row (2 Columns) */}
             <div className="grid md:grid-cols-2 grid-cols-1 gap-6 mb-6">
               {dataWorks.slice(0, 2).map((work) => (
-                <Link to={`/works/${work.id}`} className={stylesWork.workItem}>
+                <Link to={`/works/${work.id}`} className="workItem">
                   <div className="overflow-hidden">
-                    <img
-                      src={work.imageUrl}
-                      alt={work.title}
-                      className="w-full object-cover transition-transform duration-700 hover:scale-[105%]"
-                    />
-                    <div className="mt-[20px] flex justify-between">
+                    <div className="overflow-hidden">
+                      <img
+                        src={work.imageUrl}
+                        alt={work.title}
+                        className="w-full object-cover transition-transform duration-700 hover:scale-[105%]"
+                      />
+                    </div>
+                    <div className="mt-[20px] flex justify-between workInfo">
                       <div className="text-black">
-                        <span>{work.title}</span>
-                        <span> I {work.client}</span>
+                        <span className="pre">I</span>
+                        <span className="workTitle">{work.title}</span>
+                        <span className="divider">&nbsp;I&nbsp;</span>
+                        <span>{work.client}</span>
                       </div>
                       <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>
@@ -622,17 +626,24 @@ const Home = () => {
             {/* Second Row (3 Columns) */}
             <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
               {dataWorks.slice(2, 5).map((work) => (
-                <Link to={`/works/${work.id}`} className={stylesWork.workItem}>
+                <Link
+                  to={`/works/${work.id}`}
+                  className="workItem"
+                >
                   <div className="overflow-hidden">
-                    <img
-                      src={work.imageUrl}
-                      alt={work.title}
-                      className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
-                    />
-                    <div className="mt-[20px] flex justify-between">
+                    <div className="overflow-hidden">
+                      <img
+                        src={work.imageUrl}
+                        alt={work.title}
+                        className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                      />
+                    </div>
+                    <div className="mt-[20px] flex justify-between workInfo">
                       <div className="text-black">
-                        <span>{work.title}</span>
-                        <span> I {work.client}</span>
+                        <span className="pre">I</span>
+                        <span className="workTitle">{work.title}</span>
+                        <span className="divider">&nbsp;I&nbsp;</span>
+                        <span>{work.client}</span>
                       </div>
                       <div className="text-[#B4B4B4]">{work.category}</div>
                     </div>
@@ -679,7 +690,7 @@ const Home = () => {
         </FadeInSection>
         <FadeInSection delay={0.3}>
           <div className="px-5 w-full mb-[155px]">
-            <div className="mt-[122px] text-left max-w-[574px] lg:text-[24px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
+            <div className="mt-[122px] text-left max-w-[574px]   lg:text-[20px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
               HAVE A PROJECT IN MIND? LET'S GET TO WORK.
               <br />
               WE'RE ALWAYS OPEN FOR A CHAT,

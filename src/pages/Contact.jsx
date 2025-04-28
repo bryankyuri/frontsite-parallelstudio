@@ -42,7 +42,7 @@ const Contact = () => {
       <FadeInSection delay={0.3}>
         <section className=" w-full px-5 mb-[148px] lg:mb-0" id="contact-form">
           <div className="lg:w-1/2 w-full">
-            <div className="lg:text-[24px] text-[16px] font-semibold text-black mb-10">
+            <div className="  lg:text-[20px] text-[16px] font-semibold text-black mb-10">
               SEND A MESSAGE
             </div>
             <div className="grid lg:grid-cols-2 lg:gap-5 grid-cols-1">

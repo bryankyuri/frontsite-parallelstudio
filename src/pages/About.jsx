@@ -242,7 +242,7 @@ const About = () => {
       <section className="services py-20" id="our-services">
         <div className="w-full px-5">
           <FadeInSection delay={0.3}>
-            <h2 className="lg:text-[24px] text-[16px] font-bold pb-20 text-black">
+            <h2 className="  lg:text-[20px] text-[16px] font-bold pb-20 text-black">
               OUR SERVICES
             </h2>
           </FadeInSection>
@@ -298,7 +298,7 @@ const About = () => {
       <section className="services py-20" id="our-services">
         <div className="w-full px-5">
           <FadeInSection delay={0.3}>
-            <h2 className="lg:text-[24px] text-[16px] font-bold mb-5 text-black">OUR TEAM</h2>
+            <h2 className="  lg:text-[20px] text-[16px] font-bold mb-5 text-black">OUR TEAM</h2>
           </FadeInSection>
           <div className="grid lg:grid-cols-4 grid-cols-2 gap-5">
             {team.map((member) => (
@@ -432,7 +432,7 @@ const About = () => {
 
       <FadeInSection delay={0.3}>
         <div className="px-5 w-full mb-[155px]">
-          <div className="mt-[122px] text-left max-w-[574px] lg:text-[24px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
+          <div className="mt-[122px] text-left max-w-[574px]   lg:text-[20px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
             HAVE A PROJECT IN MIND? LET'S GET TO WORK.
             <br />
             WE'RE ALWAYS OPEN FOR A CHAT,

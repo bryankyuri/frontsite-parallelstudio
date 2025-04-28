@@ -78,3 +78,40 @@ button {
   border-width: 3px !important;
   border-color: white !important;
 }
+
+.workItem {
+  .workInfo {
+    .pre {
+      font-weight: bold;
+      transition: all 0.1s ease-in-out;
+      opacity: 0;
+    }
+    .workTitle {
+      margin-right: 0;
+      transition: all 0.3s ease-in-out;
+    }
+    .divider {
+      margin-left: 0;
+      margin-right: 0;
+      transition: all 0.3s ease-in-out;
+    }
+  }
+}
+.workItem:hover {
+  .workInfo {
+    .pre {
+      font-weight: bold;
+      transition: all 0.1s ease-in-out;
+      opacity: 1;
+    }
+    .workTitle {
+      margin-left: 12px;
+      transition: all 0.3s ease-in-out;
+    }
+    .divider {
+      margin-left: 12px;
+      margin-right: 12px;
+      transition: all 0.3s ease-in-out;
+    }
+  }
+}
