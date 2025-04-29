@@ -424,6 +424,26 @@ const Home = () => {
     },
   };
 
+  // Add these near your other state variables
+  const [showSpans, setShowSpans] = useState([false, false, false, false]);
+
+  // Add this function to handle the sequence animation
+  const handleProjectLinkHover = (isHovering) => {
+    if (isHovering) {
+      // Show spans sequentially when hovering
+      setShowSpans([true, false, false, false]);
+      setTimeout(() => setShowSpans([true, true, false, false]), 100);
+      setTimeout(() => setShowSpans([true, true, true, false]), 200);
+      setTimeout(() => setShowSpans([true, true, true, true]), 300);
+    } else {
+      // Hide spans sequentially when not hovering
+      setShowSpans([true, true, true, false]);
+      setTimeout(() => setShowSpans([true, true, false, false]), 100);
+      setTimeout(() => setShowSpans([true, false, false, false]), 200);
+      setTimeout(() => setShowSpans([false, false, false, false]), 300);
+    }
+  };
+
   console.log(scrollDirection, isWindowLocked, activeProject);
   return (
     <div className={styles.home}>
@@ -626,10 +646,7 @@ const Home = () => {
             {/* Second Row (3 Columns) */}
             <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
               {dataWorks.slice(2, 5).map((work) => (
-                <Link
-                  to={`/works/${work.id}`}
-                  className="workItem"
-                >
+                <Link to={`/works/${work.id}`} className="workItem">
                   <div className="overflow-hidden">
                     <div className="overflow-hidden">
                       <img
@@ -653,12 +670,43 @@ const Home = () => {
             </div>
 
             {/* View All Projects Button */}
-            <div className="my-20 text-center">
+            <div className="my-20 text-center w-full">
               <Link
                 to="/works"
-                className="bg-black text-white p-4 font-semibold rounded hover:bg-gray-800 transition duration-300"
+                className="mx-auto hover:bg-black hover:text-white py-4 font-semibold rounded bg-[#F0F0F0] text-[#787878] transition duration-300 relative flex items-center justify-center w-[228px]"
+                onMouseEnter={() => handleProjectLinkHover(true)}
+                onMouseLeave={() => handleProjectLinkHover(false)}
               >
-                VIIIIIEW ALL PROJECT
+                VI
+                <span
+                  className={`project-link-span ${
+                    showSpans[0] ? "w-[4.38px] " : "w-0 "
+                  }`}
+                >
+                  I
+                </span>
+                <span
+                  className={`project-link-span ${
+                    showSpans[1] ? "w-[4.38px] " : "w-0 "
+                  }`}
+                >
+                  I
+                </span>
+                <span
+                  className={`project-link-span ${
+                    showSpans[2] ? "w-[4.38px] " : "w-0 "
+                  }`}
+                >
+                  I
+                </span>
+                <span
+                  className={`project-link-span ${
+                    showSpans[3] ? "w-[4.38px] " : "w-0 "
+                  }`}
+                >
+                  I
+                </span>
+                EW ALL PROJECT
               </Link>
             </div>
           </div>

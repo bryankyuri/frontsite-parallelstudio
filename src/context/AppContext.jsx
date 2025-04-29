@@ -20,7 +20,7 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     window.addEventListener("resize", screenResize);
-   
+
     return () => {
       window.removeEventListener("resize", screenResize);
     };
@@ -39,70 +39,72 @@ export const AppProvider = ({ children }) => {
   // Enhanced browser detection, especially for iOS
   const detectBrowser = () => {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    
+
     // iOS specific detection - all browsers on iOS use WebKit/Safari
     if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
       // iOS Chrome has CriOS in user agent
-      if (/CriOS/.test(userAgent)) return 'Chrome';
-      
+      if (/CriOS/.test(userAgent)) return "Chrome";
+
       // iOS Firefox has FxiOS in user agent
-      if (/FxiOS/.test(userAgent)) return 'Firefox';
-      
+      if (/FxiOS/.test(userAgent)) return "Firefox";
+
       // iOS Edge has EdgiOS in user agent
-      if (/EdgiOS/.test(userAgent)) return 'Edge';
-      
+      if (/EdgiOS/.test(userAgent)) return "Edge";
+
       // iOS Opera has OPiOS in user agent
-      if (/OPiOS/.test(userAgent)) return 'Opera';
-      
+      if (/OPiOS/.test(userAgent)) return "Opera";
+
       // Default iOS browser is Safari
-      return 'Safari';
+      return "Safari";
     }
-    
+
     // Non-iOS browser detection
-    if (/OPR|Opera/.test(userAgent)) return 'Opera';
-    if (/Edg/.test(userAgent)) return 'Edge';
-    if (/Chrome/.test(userAgent)) return 'Chrome';
-    if (/Firefox/.test(userAgent)) return 'Firefox';
-    if (/Safari/.test(userAgent)) return 'Safari';
-    if (/Trident/.test(userAgent)) return 'Internet Explorer';
-    
-    return 'Unknown';
+    if (/OPR|Opera/.test(userAgent)) return "Opera";
+    if (/Edg/.test(userAgent)) return "Edge";
+    if (/Chrome/.test(userAgent)) return "Chrome";
+    if (/Firefox/.test(userAgent)) return "Firefox";
+    if (/Safari/.test(userAgent)) return "Safari";
+    if (/Trident/.test(userAgent)) return "Internet Explorer";
+
+    return "Unknown";
   };
 
   // Detect device information on mount
   useEffect(() => {
     // Detect if running as PWA
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                        window.navigator.standalone || 
-                        document.referrer.includes('android-app://');
+   
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone ||
+      document.referrer.includes("android-app://");
     setIsPWA(isStandalone);
-    
+
     // Detect OS
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    
+
     // OS Detection - simplified
-    let detectedOS = 'Unknown';
+    let detectedOS = "Unknown";
     if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-      detectedOS = 'iOS';
+      detectedOS = "iOS";
     } else if (/Android/.test(userAgent)) {
-      detectedOS = 'Android';
+      detectedOS = "Android";
     } else if (/Mac OS X/.test(userAgent)) {
-      detectedOS = 'macOS';
+      detectedOS = "macOS";
     } else if (/Windows/.test(userAgent)) {
-      detectedOS = 'Windows';
+      detectedOS = "Windows";
     } else if (/Linux/.test(userAgent)) {
-      detectedOS = 'Linux';
+      detectedOS = "Linux";
     }
     setOsType(detectedOS);
-    
+
     // Use the enhanced browser detection
     setBrowserType(detectBrowser());
-    
-    console.log('Device detection:', {
+
+    console.log("Device detection:", {
       isPWA: isStandalone,
       osType: detectedOS,
       browserType: detectBrowser(),
-      userAgent
+      userAgent,
     });
   }, []);
 
