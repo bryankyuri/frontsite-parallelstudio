@@ -71,19 +71,41 @@ export default defineConfig({
         ]
       },
       manifest: {
-        name: 'React Vite PWA',
-        short_name: 'VitePWA',
+        name: 'Parallel Studio',
+        short_name: 'Parallel',
+        description: 'Independent post-production house for color grading, motion graphics, and CGI',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',
-        theme_color: '#ffffff',
+        theme_color: '#000000',
         icons: [
           {
-            src: 'vite.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: '/android-chrome-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any maskable'
           },
+          {
+            src: '/android-chrome-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: '/favicon.ico',
+            sizes: '48x48',
+            type: 'image/x-icon'
+          }
         ],
+        categories: ['design', 'production', 'video', 'creative'],
+        screenshots: [
+          {
+            src: '/hero-banner-about.png',
+            sizes: '1280x720',
+            type: 'image/png',
+            label: 'Parallel Studio About Page'
+          }
+        ]
       },
       devOptions: {
         enabled: true,
@@ -98,7 +120,7 @@ export default defineConfig({
     strictPort: true, // Don't try another port if 3000 is in use
     hmr: false,
     cors: true, // Enable CORS
-    allowedHosts: ['parallelstudio.virtual-app.my.id', 'localhost'], // Add this line
+    allowedHosts: ['https://parallelstudio.asia', 'localhost'], // Add this line
   },
   build: {
     outDir: 'dist',
