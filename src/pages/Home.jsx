@@ -374,11 +374,14 @@ const Home = () => {
       });
       if (index === tempDataProjects.length - 1) {
         setActiveProject(activeProject - 1);
+        setHoveredProject(activeProject - 1);
       } else {
         if (tempDataProjects[index + 1].position === 0) {
           setActiveProject(activeProject - 1);
+          setHoveredProject(activeProject - 1);
         } else {
           setActiveProject(activeProject + 1);
+          setHoveredProject(activeProject + 1);
         }
       }
     } else {
@@ -738,7 +741,7 @@ const Home = () => {
         </FadeInSection>
         <FadeInSection delay={0.3}>
           <div className="px-5 w-full mb-[155px]">
-            <div className="mt-[122px] text-left max-w-[574px]   lg:text-[20px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
+            <div className="mt-[122px] text-left max-w-[574px] lg:text-[20px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
               HAVE A PROJECT IN MIND? LET'S GET TO WORK.
               <br />
               WE'RE ALWAYS OPEN FOR A CHAT,
@@ -756,8 +759,7 @@ const Home = () => {
           </div>
         </FadeInSection>
       </div>
-      {isWindowLocked &&
-        activeProject > -1 &&
+      {activeProject > -1 &&
         hoveredProject !== null &&
         deviceType === "desktop" && (
           <div
@@ -770,17 +772,30 @@ const Home = () => {
               height: "120px",
               borderRadius: "50%",
               mixBlendMode: "difference",
-              fontWeight: "bold",
+              fontWeight: "semibold",
               color: "white",
               overflow: "hidden",
             }}
           >
             <div className="marquee-container overflow-hidden w-[80%]">
-              <div className="marquee-text whitespace-nowrap animate-marquee">
-                {projects[hoveredProject]?.title} •{" "}
-                {projects[hoveredProject]?.client} •{" "}
-                {projects[hoveredProject]?.title} •{" "}
-                {projects[hoveredProject]?.client} •{" "}
+              <div className="marquee-text whitespace-nowrap animate-marquee text-[13px]">
+                I&nbsp;&nbsp;&nbsp;
+                {projects[activeProject]
+                  ? projects[activeProject].title
+                  : projects[hoveredProject]?.title}
+                &nbsp;&nbsp;&nbsp;I&nbsp;&nbsp;&nbsp;
+                {projects[activeProject]
+                  ? projects[activeProject].client
+                  : projects[hoveredProject]?.client}
+                &nbsp;&nbsp;&nbsp;I&nbsp;&nbsp;&nbsp;
+                {projects[activeProject]
+                  ? projects[activeProject].title
+                  : projects[hoveredProject]?.title}
+                &nbsp;&nbsp;&nbsp;I&nbsp;&nbsp;&nbsp;
+                {projects[activeProject]
+                  ? projects[activeProject].client
+                  : projects[hoveredProject]?.client}
+                &nbsp;&nbsp;&nbsp;
               </div>
             </div>
           </div>
