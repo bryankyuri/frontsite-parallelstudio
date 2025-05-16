@@ -585,7 +585,7 @@ const Home = () => {
         </div>
         <div
           id="about-wording"
-          className="px-5 pt-8 uppercase font-extrabold text-black text-[24px] leading-[30px] lg:text-[44px] lg:leading-[54px] lg:pb-[185px] pb-[140px]"
+          className="px-5 lg:pt-[65px] pt:[40px] uppercase font-extrabold text-black text-[24px] leading-[30px] lg:text-[44px] lg:leading-[54px] lg:pb-[65px] pb-[40px] text-justify"
         >
           {words.map((word, index) => {
             const delayFactor =

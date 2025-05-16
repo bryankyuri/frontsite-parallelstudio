@@ -90,13 +90,44 @@ button {
   }
 }
 
+// @keyframes rectangleStep2 {
+//   0% {
+//     width: 25px;
+//   }
+
+//   100% {
+//     width: 5px;
+//   }
+// }
+
+// @keyframes LWrapperStep2 {
+//   0% {
+//     opacity: 0;
+//   }
+
+//   100% {
+//     opacity: 0;
+//   }
+// }
+
+// @keyframes LContainerStep2 {
+//   0% {
+//     width: 27px;
+//   }
+
+//   100% {
+//     width: 5px;
+//     margin-right: 2px;
+//   }
+// }
+
 @keyframes rectangleStep2 {
   0% {
-    width: 25px;
+    width: 5px;
   }
 
   100% {
-    width: 5px;
+    width: 25px;
   }
 }
 
@@ -106,42 +137,11 @@ button {
   }
 
   100% {
-    opacity: 0;
-  }
-}
-
-@keyframes LContainerStep2 {
-  0% {
-    width: 27px;
-  }
-
-  100% {
-    width: 5px;
-    margin-right: 2px;
-  }
-}
-
-@keyframes rectangleStep3 {
-  0% {
-    width: 5px;
-  }
-
-  100% {
-    width: 25px;
-  }
-}
-
-@keyframes LWrapperStep3 {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
     opacity: 1;
   }
 }
 
-@keyframes LContainerStep3 {
+@keyframes LContainerStep2 {
   0% {
     width: 5px;
     margin-right: 2px;
@@ -153,7 +153,7 @@ button {
   }
 }
 
-@keyframes rectangleStep4 {
+@keyframes rectangleStep3 {
   0% {
     width: 25px;
     left: auto;
@@ -172,31 +172,31 @@ button {
   animation: rectangleStep1 0.6s ease-in;
 }
 
+// #logoParallel.step-2 .rectangle {
+//   animation: rectangleStep2 0.45s ease-in;
+// }
+
+// #logoParallel.step-2 .l-wrapper {
+//   animation: LWrapperStep2 0.45s ease-in;
+// }
+
+// #logoParallel.step-2 .l-container {
+//   animation: LContainerStep2 0.45s ease-in;
+// }
+
 #logoParallel.step-2 .rectangle {
-  animation: rectangleStep2 0.45s ease-in;
-}
-
-#logoParallel.step-2 .l-wrapper {
-  animation: LWrapperStep2 0.45s ease-in;
-}
-
-#logoParallel.step-2 .l-container {
-  animation: LContainerStep2 0.45s ease-in;
-}
-
-#logoParallel.step-3 .rectangle {
   animation: rectangleStep3 0.45s ease-in;
 }
 
-#logoParallel.step-3 .l-wrapper {
+#logoParallel.step-2 .l-wrapper {
   animation: LWrapperStep3 0.45s ease-in;
 }
 
-#logoParallel.step-3 .l-container {
+#logoParallel.step-2 .l-container {
   animation: LContainerStep3 0.45s ease-in;
 }
 
-#logoParallel.step-4 .rectangle {
+#logoParallel.step-3 .rectangle {
   animation: rectangleStep4 0.6s ease-in;
 }
 
@@ -212,8 +212,8 @@ button {
       transition: all 0.3s ease-in-out;
     }
     .divider {
-      margin-left: 0;
-      margin-right: 0;
+      margin-left: 12px;
+      margin-right: 12px;
       transition: all 0.3s ease-in-out;
     }
   }
@@ -231,8 +231,6 @@ button {
       transition: all 0.3s ease-in-out;
     }
     .divider {
-      margin-left: 12px;
-      margin-right: 12px;
       transition: all 0.3s ease-in-out;
     }
   }

@@ -64,7 +64,7 @@ const Navigation = ({ deviceType }) => {
     animationTimerRef.current = setTimeout(() => {
       // If still hovering, advance to next step or loop back to step 1
       if (isHovering) {
-        if (animationStep < 4) {
+        if (animationStep < 3) {
           setAnimationStep(animationStep + 1);
         } else {
           // After step 4, go back to step 1 to create a loop
