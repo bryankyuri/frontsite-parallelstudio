@@ -21,7 +21,7 @@ import { debounce } from "lodash";
 const Home = () => {
   const { vh, deviceType } = useContext(AppContext);
   // Default to null so no accordion is open by default
-  const [activeProject, setActiveProject] = useState(-1);
+  const [activeProject, setActiveProject] = useState(0);
   // Track which project image to display (default to first)
   const [activeImage, setActiveImage] = useState(0);
   const [scrollDirection, setScrollDirection] = useState(null);
@@ -122,6 +122,8 @@ const Home = () => {
   // Add these state variables
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [hoveredProject, setHoveredProject] = useState(null);
+  const [touchStartY, setTouchStartY] = useState(0);
+  const [touchThreshold, setTouchThreshold] = useState(50); // Sensitivity threshold
 
   // Add custom cursor styles
   const customCursorStyles = `
@@ -193,63 +195,23 @@ const Home = () => {
   }, []);
 
   // Create debounced handlers using useRef for stable references
-  const handleWheel = useCallback(
-    debounce((event) => {
-      const windowScroll = window.scrollY;
-      const direction = event.deltaY > 0 ? "down" : "up";
-      if (direction === "down") {
-        if (activeProject === projects.length - 1) {
-          setIsWindowLocked(false);
-        } else {
-          handleAccrodionClick(activeProject + 1);
-        }
-      } else {
-        console.log("activeProject", activeProject, isWindowLocked);
-        if (activeProject === projects.length - 1) {
-          if (windowScroll === 0) {
-            console.log("test0");
-            if (isWindowLocked) {
-              handleAccrodionClick(activeProject - 1);
-            } else {
-              console.log("test1");
-              setIsWindowLocked(true);
-            }
-          }
-        } else {
-          console.log("test");
-          if (activeProject === 0) {
-            handleAccrodionClick(activeProject);
-          } else {
-            handleAccrodionClick(activeProject - 1);
-          }
-        }
-      }
-    }, 150), // 50ms debounce time
-    [activeProject, isWindowLocked]
-  );
-
   const handleKeyDown = useCallback(
     debounce((event) => {
       const windowScroll = window.scrollY;
       if (event.key === "ArrowUp") {
         if (activeProject === projects.length - 1) {
           if (windowScroll === 0) {
-            console.log("test0");
             if (isWindowLocked) {
               handleAccrodionClick(activeProject - 1);
             } else {
-              console.log("test1");
               setIsWindowLocked(true);
             }
           }
-        } else {
-          console.log("test");
-          if (activeProject === 0) {
-            handleAccrodionClick(activeProject);
-          } else {
-            handleAccrodionClick(activeProject - 1);
-          }
+        } else if (activeProject > 0) {
+          // Only allow slide up if activeProject > 0
+          handleAccrodionClick(activeProject - 1);
         }
+        // Do nothing when activeProject is 0 and trying to slide up
       } else if (event.key === "ArrowDown") {
         if (activeProject === projects.length - 1) {
           setIsWindowLocked(false);
@@ -257,16 +219,12 @@ const Home = () => {
           handleAccrodionClick(activeProject + 1);
         }
       }
-    }, 150), // 50ms debounce time
+    }, 150),
     [activeProject, isWindowLocked]
   );
 
-  // Add this state to track touch positions
-  const [touchStartY, setTouchStartY] = useState(0);
-
-  // Create touch handlers using useRef for stable references
+  // Improved touch handlers
   const handleTouchStart = useCallback((event) => {
-    // Store the initial touch Y position
     setTouchStartY(event.touches[0].clientY);
   }, []);
 
@@ -278,10 +236,16 @@ const Home = () => {
       // Calculate direction based on touch delta
       const touchEndY = event.touches[0].clientY;
       const touchDelta = touchStartY - touchEndY;
+
+      // Exit if movement is too small (improves trackpad experience)
+      if (Math.abs(touchDelta) < touchThreshold) {
+        return;
+      }
+
       const direction = touchDelta > 0 ? "down" : "up";
       const windowScroll = window.scrollY;
 
-      // Use the same logic as handleWheel
+      // Use the same logic as handleWheel with added sensitivity control
       if (direction === "down") {
         if (activeProject === projects.length - 1) {
           setIsWindowLocked(false);
@@ -297,114 +261,16 @@ const Home = () => {
               setIsWindowLocked(true);
             }
           }
-        } else {
-          if (activeProject === 0) {
-            handleAccrodionClick(activeProject);
-          } else {
-            handleAccrodionClick(activeProject - 1);
-          }
+        } else if (activeProject > 0) {
+          handleAccrodionClick(activeProject - 1);
         }
       }
 
       // Reset the touch start position
       setTouchStartY(0);
-    }, 150),
-    [activeProject, isWindowLocked, touchStartY, projects.length]
+    }, 100), // Reduced debounce time for more responsiveness
+    [activeProject, isWindowLocked, touchStartY, projects.length, touchThreshold]
   );
-
-  // Add event listeners
-  useEffect(() => {
-    window.addEventListener("wheel", handleWheel);
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchmove", handleTouchMove);
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
-    };
-  }, [handleWheel, handleKeyDown, handleTouchStart, handleTouchMove]);
-
-  useEffect(() => {
-    if (isWindowLocked) {
-      document.body.style.overflow = "hidden"; // Lock scrollbar
-    } else {
-      document.body.style.overflow = ""; // Unlock scrollbar
-    }
-
-    // Cleanup function - runs when component unmounts or before effect reruns
-    return () => {
-      document.body.style.overflow = ""; // Reset scrollbar on unmount
-    };
-  }, [isWindowLocked]);
-
-  const handleAccrodionClick = (index) => {
-    const tempDataProjects = [...projects];
-    let newDataProject = [];
-
-    const isPositionOpen = tempDataProjects[index].position < 0;
-    if (isPositionOpen) {
-      tempDataProjects.map((project, i) => {
-        if (index === tempDataProjects.length - 1) {
-          if (i === index) {
-            project.position = 0;
-            newDataProject.push(project);
-          } else {
-            newDataProject.push(project);
-          }
-        } else {
-          if (tempDataProjects[index + 1].position === 0) {
-            if (i >= index) {
-              project.position = 0;
-              newDataProject.push(project);
-            } else {
-              newDataProject.push(project);
-            }
-          } else {
-            if (i > index) {
-              project.position = 0;
-              newDataProject.push(project);
-            } else {
-              newDataProject.push(project);
-            }
-          }
-        }
-      });
-      if (index === tempDataProjects.length - 1) {
-        setActiveProject(activeProject - 1);
-        setHoveredProject(activeProject - 1);
-      } else {
-        if (tempDataProjects[index + 1].position === 0) {
-          setActiveProject(activeProject - 1);
-          setHoveredProject(activeProject - 1);
-        } else {
-          setActiveProject(activeProject + 1);
-          setHoveredProject(activeProject + 1);
-        }
-      }
-    } else {
-      tempDataProjects.map((project, i) => {
-        if (i <= index) {
-          project.position = (vh - 202) * -1;
-          newDataProject.push(project);
-        } else {
-          newDataProject.push(project);
-        }
-      });
-      setActiveProject(activeProject + 1);
-      if (activeProject + 1 === projects.length - 1) {
-        setIsWindowLocked(false);
-      }
-    }
-
-    if (!isWindowLocked) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      setIsWindowLocked(true);
-    }
-    setProjects(newDataProject);
-  };
 
   // Add this near your other state variables
   const projectVariants = {
@@ -447,6 +313,210 @@ const Home = () => {
     }
   };
 
+  // Add these state variables at the top with your other state
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [lastEventTime, setLastEventTime] = useState(0);
+  const ANIMATION_DURATION = 700; // Match your animation duration (ms)
+  const EVENT_THRESHOLD = 50; // Minimum ms between distinct gestures
+
+  // Add these state variables
+  const deltaAccumulator = useRef(0);
+  const lastWheelDirection = useRef(null);
+  const wheelTimeout = useRef(null);
+
+  // Modified handleWheel function that preserves all your existing functionality
+  const handleWheel = useCallback(
+    (event) => {
+      const now = Date.now();
+      const windowScroll = window.scrollY;
+      const direction = event.deltaY > 0 ? "down" : "up";
+
+      // Always prevent default when window is locked
+      if (isWindowLocked) {
+        event.preventDefault();
+      }
+
+      // Clear any pending timeout
+      if (wheelTimeout.current) {
+        clearTimeout(wheelTimeout.current);
+      }
+
+      // If already animating, ignore events completely
+      if (isAnimating) {
+        event.preventDefault();
+        return;
+      }
+
+      // If direction changed, reset accumulator
+      if (lastWheelDirection.current !== direction) {
+        deltaAccumulator.current = 0;
+        lastWheelDirection.current = direction;
+      }
+
+      // Accumulate delta (works for both mouse wheel and trackpad)
+      deltaAccumulator.current += Math.abs(event.deltaY);
+
+      // Different thresholds based on device detection
+      const thresholdForScroll = /Mac|MacIntel/.test(navigator.platform)
+        ? 50  // Lower threshold for Mac trackpads
+        : 100;
+
+      // Only trigger navigation when accumulated delta is large enough
+      if (deltaAccumulator.current >= thresholdForScroll) {
+        // Reset accumulator
+        deltaAccumulator.current = 0;
+        
+        // Set animation flag to prevent further events
+        setIsAnimating(true);
+        
+        // Rest of your existing logic unchanged
+        if (direction === "down") {
+          if (activeProject === projects.length - 1) {
+            setIsWindowLocked(false);
+            setIsAnimating(false);
+          } else {
+            handleAccrodionClick(activeProject + 1);
+            setTimeout(() => setIsAnimating(false), ANIMATION_DURATION);
+          }
+        } else {
+          if (activeProject === projects.length - 1) {
+            if (windowScroll === 0) {
+              if (isWindowLocked) {
+                handleAccrodionClick(activeProject - 1);
+                setTimeout(() => setIsAnimating(false), ANIMATION_DURATION);
+              } else {
+                setIsWindowLocked(true);
+                setIsAnimating(false);
+              }
+            } else {
+              setIsAnimating(false);
+            }
+          } else if (activeProject > 0) {
+            handleAccrodionClick(activeProject - 1);
+            setTimeout(() => setIsAnimating(false), ANIMATION_DURATION);
+          } else {
+            setIsAnimating(false);
+          }
+        }
+      }
+
+      // Set timeout to reset accumulator after a short period of inactivity
+      wheelTimeout.current = setTimeout(() => {
+        deltaAccumulator.current = 0;
+        lastWheelDirection.current = null;
+      }, 300);
+    },
+    [activeProject, isWindowLocked, isAnimating, projects.length]
+  );
+
+  // Add event listeners
+  useEffect(() => {
+    // The passive: false option is crucial for preventDefault() to work
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [handleWheel, handleKeyDown, handleTouchStart, handleTouchMove]);
+
+  // Add this useEffect to control body scroll behavior
+  useEffect(() => {
+    if (isWindowLocked) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = ""; // Cleanup
+    };
+  }, [isWindowLocked]);
+
+  const handleAccrodionClick = (index) => {
+    // Clone the projects array to avoid direct state mutation
+    const tempDataProjects = [...projects];
+    let newDataProject = [];
+
+    // Check if the clicked project is already open (position is negative)
+    const isPositionOpen = tempDataProjects[index].position < 0;
+
+    if (isPositionOpen) {
+      // If project is already open, clicking closes it
+      tempDataProjects.forEach((project, i) => {
+        // Last project handling
+        if (index === tempDataProjects.length - 1) {
+          if (i === index) {
+            project.position = 0;
+          }
+          newDataProject.push(project);
+        } else {
+          // For projects other than last
+          if (tempDataProjects[index + 1].position === 0) {
+            if (i >= index) {
+              project.position = 0;
+            }
+            newDataProject.push(project);
+          } else {
+            if (i > index) {
+              project.position = 0;
+            }
+            newDataProject.push(project);
+          }
+        }
+      });
+
+      // Update active project based on position
+      if (index === tempDataProjects.length - 1) {
+        // Safety check to prevent activeProject going below 0
+        const newActiveProject = Math.max(0, activeProject - 1);
+        setActiveProject(newActiveProject);
+        setHoveredProject(newActiveProject);
+      } else {
+        if (tempDataProjects[index + 1].position === 0) {
+          // Safety check to prevent activeProject going below 0
+          const newActiveProject = Math.max(0, activeProject - 1);
+          setActiveProject(newActiveProject);
+          setHoveredProject(newActiveProject);
+        } else {
+          setActiveProject(index + 1);
+          setHoveredProject(index + 1);
+        }
+      }
+    } else {
+      // If project is closed, clicking opens it
+      tempDataProjects.forEach((project, i) => {
+        if (i <= index) {
+          // Move all projects up to and including clicked one off screen
+          project.position = (vh - 202) * -1;
+        }
+        newDataProject.push(project);
+      });
+      
+      // Set clicked project as active
+      setActiveProject(index);
+      
+      // If last project is activated, unlock the window for scrolling
+      if (index === projects.length - 1) {
+        setIsWindowLocked(false);
+      }
+    }
+
+    // If window was unlocked, lock it and scroll to top
+    if (!isWindowLocked) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setIsWindowLocked(true);
+    }
+    
+    // Update projects state with new positions
+    setProjects(newDataProject);
+  };
+
   console.log(scrollDirection, isWindowLocked, activeProject);
   return (
     <div className={styles.home}>
@@ -455,7 +525,7 @@ const Home = () => {
           id="banner"
           className="relative h-[calc(100vh-62px)] overflow-hidden overscroll-y-none"
         >
-          <div className="sticky top-0 left-0 w-full h-[calc(100vh-62px)] overflow-hidden z-[1] overscroll-y-none">
+          {/* <div className="sticky top-0 left-0 w-full h-[calc(100vh-62px)] overflow-hidden z-[1] overscroll-y-none">
             <div className="absolute top-0 left-0 w-full h-[calc(100vh-62px)]">
               <video
                 src="https://cdn.jasonbradley.co/pic/ff41675d.mp4"
@@ -487,7 +557,7 @@ const Home = () => {
                 }}
               ></video>
             </div>
-          </div>
+          </div> */}
           <div
             id="projectContainer"
             className="absolute top-0 left-0 w-full h-[calc(100vh-62px)] z-[1] flex flex-col justify-end transition-all duration-700"
@@ -508,6 +578,7 @@ const Home = () => {
                       onClick={() => {
                         handleAccrodionClick(index);
                       }}
+                      id={`accordionTrigger${index}`}
                       className={`outline-none relative px-5 py-2 text-[12px] ${
                         activeProject === index
                           ? "text-white border-transparent"
@@ -585,7 +656,7 @@ const Home = () => {
         </div>
         <div
           id="about-wording"
-          className="px-5 lg:pt-[65px] pt:[40px] uppercase font-extrabold text-black text-[24px] leading-[30px] lg:text-[44px] lg:leading-[54px] lg:pb-[65px] pb-[40px] text-justify"
+          className="px-5 lg:pt-[65px] pt:[40px] uppercase font-extrabold text-black text-[24px] leading-[30px] lg:text-[44px] lg:leading-[54px] lg:pb-[65px] pb-[40px] lg:text-justify"
         >
           {words.map((word, index) => {
             const delayFactor =

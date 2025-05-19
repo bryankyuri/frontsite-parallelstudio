@@ -28,23 +28,31 @@ const Footer = ({ deviceType }) => {
           </div>
           <div className="flex">
             <div className="mr-[87px]">P</div>
-            <div>
+            <a
+              href="https://wa.me/628128263544"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex cursor-pointer no-underline text-black"
+            >
               <span className="mr-6">+62</span>
               <span>812 8626 3544</span>
-            </div>
+            </a>
           </div>
           <div className="flex">
             <div className="mr-[83px]">M</div>
-            <div>
+            <a
+              href="mailto:INFO@PARALLEL.ASIA"
+              className="cursor-pointer no-underline text-black"
+            >
               <span>INFO@PARALLEL.ASIA</span>
-            </div>
+            </a>
           </div>
         </div>
         <div className="w-full">
           <div className="font-semibold mb-10 lg:mt-0 mt-10">SOCIAL</div>
           <div className="flex flex-col">
             <a
-              href="https://www.instagram.com/parallel__studio//"
+              href="https://www.instagram.com/parallel__studio"
               target="_blank"
               rel="noopener noreferrer"
               className="lg:border-none border-t border-black lg:py-0 py-2"
