@@ -812,7 +812,8 @@ const Home = () => {
                 paddingBottom:
                   deviceType === "desktop"
                     ? "calc(56.25% - 62px)"
-                    : "calc(177.78% - 66px)", // 16:9 for desktop, 9:16 for mobile
+                    : // : "calc(177.78% - 66px)", // 16:9 for desktop, 9:16 for mobile
+                      "calc(86.25% - 62px)",
               }}
             >
               <iframe
@@ -820,7 +821,8 @@ const Home = () => {
                 src={
                   deviceType === "desktop"
                     ? "https://www.youtube.com/embed/dQw4w9WgXcQ" // Regular YouTube video
-                    : "https://www.youtube.com/embed/K3GS-KFp5Yc" // YouTube Shorts video
+                    : // : "https://www.youtube.com/embed/K3GS-KFp5Yc" // YouTube Shorts video
+                      "https://www.youtube.com/embed/dQw4w9WgXcQ"
                 }
                 title="Showreel Video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

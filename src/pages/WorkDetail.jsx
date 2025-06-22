@@ -74,6 +74,8 @@ const WorkDetail = () => {
     title: "Video Title",
     client: "Client Name",
     year: "2024",
+    description:
+      "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.",
     credits: [
       { role: "Director", name: "Your Name" },
       { role: "Producer", name: "Your Name" },
@@ -297,51 +299,93 @@ const WorkDetail = () => {
             backgroundRepeat: "no-repeat",
           }}
         ></div>
-        <div className="w-full   lg:text-[20px] text-[14px] text-black mx-auto px-5 flex mt-20 mb-20 lg:mb-5 lg:justify-end lg:flex-row flex-col-reverse border-b ">
-          <div className="w-full lg:border-b border-black"></div>
+        <div className="w-full lg:text-[20px] text-[14px] text-black mx-auto px-5 flex my-[20px] lg:justify-end lg:flex-row flex-col-reverse border-b ">
           <div className="w-full  border-t lg:border-t-0 border-b border-black">
             <FadeInSection delay={0.3}>
               <div className="w-full flex border-b border-black py-2 lg:py-5">
-                <div className="w-[35%]">CLIENT</div>
-                <div className="w-full font-medium">{work.client}</div>
-              </div>
-            </FadeInSection>
-            <FadeInSection delay={0.3}>
-              <div className="w-full flex border-b border-black py-2 lg:py-5 ">
-                <div className="w-[35%]">TITLE</div>
-                <div className="w-full font-medium">
-                  <div
-                    className="border-b border-black pb-2 lg:pb-5 
-                  lg:min-h-[91px] min-h-[71px]"
-                  >
-                    {work.title}
-                  </div>
-                  <div className="pt-2 lg:pt-5">{work.year}</div>
+                <div className="w-[68px] lg:mr-[52px] mr-[24px]">CLIENT</div>
+                <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium">
+                  {work.client}
                 </div>
               </div>
             </FadeInSection>
             <FadeInSection delay={0.3}>
-              <div className="w-full flex py-2 lg:py-5 lg:px-5 ">
-                <div className="w-[35%]">CREDITS</div>
-                <div className="w-full font-medium">
+              <div className="w-full flex border-b border-black py-2 lg:py-5">
+                <div className="w-[68px] lg:mr-[52px] mr-[24px] ">TITLE</div>
+                <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium">
+                  {work.title}
+                </div>
+              </div>
+            </FadeInSection>
+            <FadeInSection delay={0.3}>
+              <div className="w-full flex border-b border-black py-2 lg:py-5">
+                <div className="w-[68px] lg:mr-[52px] mr-[24px] ">DESC.</div>
+                <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] text-justify font-medium">
+                  {work.description}
+                </div>
+              </div>
+            </FadeInSection>
+            <FadeInSection delay={0.3}>
+              <div className="w-full flex pt-2 lg:pt-5 ">
+                <div className="w-[68px] lg:mr-[52px] mr-[24px]">CREDITS</div>
+                <div className="w-full  font-medium">
                   {work.credits.map((creditsItem, index) => (
                     <div
-                      className={`${
+                      className={`w-full ${
                         work.credits.length - 1 !== index
-                          ? "border-b border-black pb-2 lg:pb-5 mb-2 lg:mb-5"
-                          : ""
-                      }   grid grid-cols-2 gap-2`}
+                          ? "pb-2 border-b border-black lg:pb-5 mb-2 lg:mb-5"
+                          : "pb-2 border-b border-black lg:pb-5"
+                        // "pb-2 border-b border-black lg:pb-5 mb-2 lg:mb-5"
+                      }`}
                     >
-                      <div className="w-full">{creditsItem.name}</div>
-                      <div className="w-full">{creditsItem.role}</div>
+                      <div
+                        className={`lg:w-[calc(50%-120px)] w-[calc(100%-76px)] grid grid-cols-2 gap-2`}
+                      >
+                        <div className="w-full">{creditsItem.name}</div>
+                        <div className="w-full">{creditsItem.role}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             </FadeInSection>
+            <FadeInSection delay={0.3}>
+              <div className="w-full flex border-b border-black py-2 lg:py-5">
+                <div className="w-[68px] lg:mr-[52px] mr-[24px] ">©</div>
+                <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium">
+                  {work.year}
+                </div>
+              </div>
+            </FadeInSection>
           </div>
         </div>
-
+        <FadeInSection delay={0.3}>
+          <div id="ShowReel" className="lg:mb-[10px] mb-[10px]">
+            <div
+              className="relative w-full"
+              style={{
+                paddingBottom:
+                  deviceType === "desktop"
+                    ? "calc(56.25% - 62px)"
+                    : // : "calc(177.78% - 66px)", // 16:9 for desktop, 9:16 for mobile
+                      "calc(86.25% - 62px)",
+              }}
+            >
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={
+                  deviceType === "desktop"
+                    ? "https://www.youtube.com/embed/dQw4w9WgXcQ" // Regular YouTube video
+                    : // : "https://www.youtube.com/embed/K3GS-KFp5Yc" // YouTube Shorts video
+                      "https://www.youtube.com/embed/dQw4w9WgXcQ"
+                }
+                title="Showreel Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </FadeInSection>
         {/* Project Details */}
         <div className="w-full mx-auto lg:px-[10px]">
           {work.images.map((image) => (
