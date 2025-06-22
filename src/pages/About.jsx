@@ -240,7 +240,7 @@ const About = () => {
       </FadeInSection>
 
       <section className="services py-20" id="our-services">
-        <div className="w-full px-5">
+        <div className="w-full px-[10px]">
           <FadeInSection delay={0.3}>
             <h2 className="  lg:text-[20px] text-[16px] font-bold pb-20 text-black">
               OUR SERVICES
@@ -296,11 +296,11 @@ const About = () => {
       </section>
 
       <section className="services py-20" id="our-services">
-        <div className="w-full px-5">
+        <div className="w-full px-[10px]">
           <FadeInSection delay={0.3}>
             <h2 className="  lg:text-[20px] text-[16px] font-bold mb-5 text-black">OUR TEAM</h2>
           </FadeInSection>
-          <div className="grid lg:grid-cols-4 grid-cols-2 gap-5">
+          <div className="grid lg:grid-cols-4 grid-cols-2 gap-x-[10px] gap-y-5">
             {team.map((member) => (
               <FadeInSection delay={0.3} key={member.id}>
                 <div className="team-item flex flex-col text-left">
@@ -325,7 +325,7 @@ const About = () => {
       </section>
       <FadeInSection delay={0.3}>
         <section className="services py-20" id="send-portofolio">
-          <div className="w-full px-5 flex flex-col lg:flex-row lg:items-start lg:justify-between">
+          <div className="w-full px-[10px] flex flex-col lg:flex-row lg:items-start lg:justify-between">
             <div className="lg:w-[80%] w-full">
               <button className="w-[246px] h-[51px] flex justify-center items-center border bg-black border-black  text-white hover:bg-white hover:border-black  hover:text-black font-semibold rounded mb-10 transition-all duration-[0.3s]">
                 SEND US YOUR PORTFOLIO
@@ -364,7 +364,7 @@ const About = () => {
                 <div className="service-item border-b border-[#D2D2D2]">
                   <button
                     onClick={() => toggleAccordionJob(jobItem.id)}
-                    className={`px-5 py-1 flex justify-between text-left items-center w-full transition-all duration-[0.3s] ${
+                    className={`px-[10px] py-1 flex justify-between text-left items-center w-full transition-all duration-[0.3s] ${
                       openAccordionsJob === jobItem.id
                         ? "bg-black text-white"
                         : "bg-white text-black"
@@ -431,7 +431,7 @@ const About = () => {
       </section>
 
       <FadeInSection delay={0.3}>
-        <div className="px-5 w-full mb-[155px]">
+        <div className="px-[10px] w-full mb-[155px]">
           <div className="mt-[122px] text-left max-w-[574px]   lg:text-[20px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
             HAVE A PROJECT IN MIND? LET'S GET TO WORK.
             <br />

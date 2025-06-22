@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Footer = ({ deviceType }) => {
   return (
-    <footer className="px-5">
+    <footer className="px-[10px]">
       <div className="w-full mx-auto lg:pt-5 lg:border-t lg:border-black flex lg:flex-row flex-col items-start justify-between text-black">
         <div className="w-full">
           <img

@@ -17,6 +17,8 @@ import { AppContext } from "../context/AppContext";
 import { FadeInSection } from "../components/FadeInSection";
 import { video } from "framer-motion/client";
 import { debounce } from "lodash";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 const Home = () => {
   const { vh, deviceType } = useContext(AppContext);
@@ -73,35 +75,35 @@ const Home = () => {
       id: 1,
       title: "PROJECT_NAME",
       client: "CLIENTS",
-      category: "COLOR GRADING",
+      categories: ["motion graphic", "vfx", "color grading", "cgi"],
       imageUrl: "/assets/works/work1.jpg",
     },
     {
       id: 2,
       title: "PROJECT_NAME",
       client: "CLIENTS",
-      category: "CGI",
+      categories: ["motion graphic", "vfx", "color grading", "cgi"],
       imageUrl: "/assets/works/work2.jpg",
     },
     {
       id: 3,
       title: "PROJECT_NAME",
       client: "CLIENTS",
-      category: "COLOR GRADING",
+      categories: ["motion graphic", "vfx", "color grading", "cgi"],
       imageUrl: "/assets/works/work3.jpg",
     },
     {
       id: 4,
       title: "PROJECT_NAME",
       client: "CLIENTS",
-      category: "MOTION GRAPHIC",
+      categories: ["motion graphic", "vfx", "color grading", "cgi"],
       imageUrl: "/assets/works/work4.jpg",
     },
     {
       id: 5,
       title: "PROJECT_NAME",
       client: "CLIENTS",
-      category: "CGI",
+      categories: ["motion graphic", "vfx", "Color grading", "cgi"],
       imageUrl: "/assets/works/work5.jpg",
     },
   ];
@@ -269,7 +271,13 @@ const Home = () => {
       // Reset the touch start position
       setTouchStartY(0);
     }, 100), // Reduced debounce time for more responsiveness
-    [activeProject, isWindowLocked, touchStartY, projects.length, touchThreshold]
+    [
+      activeProject,
+      isWindowLocked,
+      touchStartY,
+      projects.length,
+      touchThreshold,
+    ]
   );
 
   // Add this near your other state variables
@@ -358,17 +366,17 @@ const Home = () => {
 
       // Different thresholds based on device detection
       const thresholdForScroll = /Mac|MacIntel/.test(navigator.platform)
-        ? 50  // Lower threshold for Mac trackpads
+        ? 50 // Lower threshold for Mac trackpads
         : 100;
 
       // Only trigger navigation when accumulated delta is large enough
       if (deltaAccumulator.current >= thresholdForScroll) {
         // Reset accumulator
         deltaAccumulator.current = 0;
-        
+
         // Set animation flag to prevent further events
         setIsAnimating(true);
-        
+
         // Rest of your existing logic unchanged
         if (direction === "down") {
           if (activeProject === projects.length - 1) {
@@ -497,10 +505,10 @@ const Home = () => {
         }
         newDataProject.push(project);
       });
-      
+
       // Set clicked project as active
       setActiveProject(index);
-      
+
       // If last project is activated, unlock the window for scrolling
       if (index === projects.length - 1) {
         setIsWindowLocked(false);
@@ -512,7 +520,7 @@ const Home = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setIsWindowLocked(true);
     }
-    
+
     // Update projects state with new positions
     setProjects(newDataProject);
   };
@@ -656,7 +664,7 @@ const Home = () => {
         </div>
         <div
           id="about-wording"
-          className="px-5 lg:pt-[65px] pt:[40px] uppercase font-extrabold text-black text-[24px] leading-[30px] lg:text-[44px] lg:leading-[54px] lg:pb-[65px] pb-[40px] lg:text-justify"
+          className="px-[10px] lg:pt-[65px] pt:[40px] uppercase font-extrabold text-black text-[24px] leading-[30px] lg:text-[44px] lg:leading-[54px] lg:pb-[65px] pb-[40px] lg:text-justify"
         >
           {words.map((word, index) => {
             const delayFactor =
@@ -685,62 +693,73 @@ const Home = () => {
           })}
         </div>
         <FadeInSection delay={0.3}>
-          <div id="latest-projects" className="px-5">
+          <div id="latest-projects">
             {/* Header */}
-            <h2 className="  lg:text-[20px] text-[16px] font-bold text-left mb-10 text-black">
+            <h2 className="lg:text-[20px] text-[16px] font-bold text-left mb-10 text-black px-[10px]">
               LATEST PROJECT
             </h2>
 
-            {/* First Row (2 Columns) */}
-            <div className="grid md:grid-cols-2 grid-cols-1 gap-6 mb-6">
-              {dataWorks.slice(0, 2).map((work) => (
-                <Link to={`/works/${work.id}`} className="workItem">
-                  <div className="overflow-hidden">
-                    <div className="overflow-hidden">
-                      <img
-                        src={work.imageUrl}
-                        alt={work.title}
-                        className="w-full object-cover transition-transform duration-700 hover:scale-[105%]"
-                      />
-                    </div>
-                    <div className="mt-[20px] flex justify-between workInfo">
-                      <div className="text-black">
-                        <span className="pre">I</span>
-                        <span className="workTitle">{work.title}</span>
-                        <span className="divider">&nbsp;I&nbsp;</span>
-                        <span>{work.client}</span>
+            <div className="mb-6">
+              <Swiper
+                slidesPerView={2.2}
+                spaceBetween={10}
+                className="w-full px-[10px]"
+                breakpoints={{
+                  320: {
+                    slidesPerView: 1.2,
+                    spaceBetween: 10,
+                  },
+                  768: {
+                    slidesPerView: 2.1,
+                    spaceBetween: 10,
+                  },
+                }}
+              >
+                {dataWorks.map((work, index) => (
+                  <SwiperSlide key={`second-row-${index}`}>
+                    <Link to={`/works/${work.id}`} className="workItem block">
+                      <div className="overflow-hidden">
+                        <div className="overflow-hidden relative">
+                          <img
+                            src={work.imageUrl}
+                            alt={work.title}
+                            className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                          />
+                          <div
+                            className="absolute top-0 left-0 w-full h-full flex flex-col items-start justify-end uppercase px-[15px] py-5"
+                            style={{
+                              background:
+                                "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%)",
+                            }}
+                          >
+                            {work.categories
+                              .slice() // Create a copy to avoid mutating the original array
+                              .sort((a, b) => b.length - a.length) // Sort by length descending (longest first)
+                              .map((category, catIndex) => {
+                                return (
+                                  <div
+                                    key={`category-${catIndex}`}
+                                    className={`text-white leading-none`}
+                                  >
+                                    {category}
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        </div>
+                        <div className="mt-[10px] flex justify-between workInfo">
+                          <div className="text-black">
+                            <span className="pre">I</span>
+                            <span className="workTitle">{work.title}</span>
+                            <span className="divider">&nbsp;I&nbsp;</span>
+                            <span>{work.client}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-[#B4B4B4]">{work.category}</div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Second Row (3 Columns) */}
-            <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
-              {dataWorks.slice(2, 5).map((work) => (
-                <Link to={`/works/${work.id}`} className="workItem">
-                  <div className="overflow-hidden">
-                    <div className="overflow-hidden">
-                      <img
-                        src={work.imageUrl}
-                        alt={work.title}
-                        className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
-                      />
-                    </div>
-                    <div className="mt-[20px] flex justify-between workInfo">
-                      <div className="text-black">
-                        <span className="pre">I</span>
-                        <span className="workTitle">{work.title}</span>
-                        <span className="divider">&nbsp;I&nbsp;</span>
-                        <span>{work.client}</span>
-                      </div>
-                      <div className="text-[#B4B4B4]">{work.category}</div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                    </Link>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
 
             {/* View All Projects Button */}
@@ -811,7 +830,7 @@ const Home = () => {
           </div>
         </FadeInSection>
         <FadeInSection delay={0.3}>
-          <div className="px-5 w-full mb-[155px]">
+          <div className="px-[10px] w-full mb-[155px]">
             <div className="mt-[122px] text-left max-w-[574px] lg:text-[20px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
               HAVE A PROJECT IN MIND? LET'S GET TO WORK.
               <br />

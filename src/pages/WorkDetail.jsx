@@ -9,6 +9,8 @@ import {
 } from "react-compare-slider";
 import { IconMoveToCenter } from "../components/Icon/MoveToCenter";
 import { FadeInSection } from "../components/FadeInSection";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 const WorkDetail = () => {
   const { workId } = useParams();
@@ -129,22 +131,36 @@ const WorkDetail = () => {
         id: 1,
         title: "PROJECT_NAME",
         client: "CLIENTS",
-        category: "COLOR GRADING",
+        categories: ["motion graphic", "vfx", "color grading", "cgi"],
         imageUrl: "/assets/works/work1.jpg",
       },
       {
         id: 2,
         title: "PROJECT_NAME",
         client: "CLIENTS",
-        category: "CGI",
+        categories: ["motion graphic", "vfx", "color grading", "cgi"],
         imageUrl: "/assets/works/work2.jpg",
       },
       {
         id: 3,
         title: "PROJECT_NAME",
         client: "CLIENTS",
-        category: "COLOR GRADING",
+        categories: ["motion graphic", "vfx", "color grading", "cgi"],
         imageUrl: "/assets/works/work3.jpg",
+      },
+      {
+        id: 4,
+        title: "PROJECT_NAME",
+        client: "CLIENTS",
+        categories: ["motion graphic", "vfx", "color grading", "cgi"],
+        imageUrl: "/assets/works/work4.jpg",
+      },
+      {
+        id: 5,
+        title: "PROJECT_NAME",
+        client: "CLIENTS",
+        categories: ["motion graphic", "vfx", "Color grading", "cgi"],
+        imageUrl: "/assets/works/work5.jpg",
       },
     ],
   };
@@ -162,7 +178,7 @@ const WorkDetail = () => {
         );
       case "2col-full":
         return (
-          <div className="grid grid-cols-2 lg:gap-5 gap-[10px]">
+          <div className="grid grid-cols-2 gap-[10px]">
             {imageUrl.map((url, index) => (
               <img
                 key={index}
@@ -178,7 +194,7 @@ const WorkDetail = () => {
         return (
           <div className="w-full relative">
             {/* Create a proper sticky container with background */}
-            <div className="sticky top-[62px] z-20 w-full bg-opacity-10 pt-4 px-4">
+            <div className="sticky top-[62px] z-20 w-full bg-opacity-10 pt-4 px-[10px]">
               <div className="flex justify-between items-center">
                 {sliderPosition !== 0 && (
                   <button
@@ -248,7 +264,7 @@ const WorkDetail = () => {
         );
       case "2col-4:5":
         return (
-          <div className="grid grid-cols-2 lg:gap-5 gap-[10px]">
+          <div className="grid grid-cols-2 gap-[10px]">
             {imageUrl.map((url, index) => (
               <img
                 key={index}
@@ -281,18 +297,6 @@ const WorkDetail = () => {
             backgroundRepeat: "no-repeat",
           }}
         ></div>
-
-        {/* Project Details */}
-        <div className="w-full mx-auto lg:px-5">
-          {work.images.map((image) => (
-            <div key={image.id} className="lg:mb-5 mb-[10px]">
-              <FadeInSection delay={0.3}>
-                {renderImage(image.type, image.imageUrl)}
-              </FadeInSection>
-            </div>
-          ))}
-        </div>
-
         <div className="w-full   lg:text-[20px] text-[14px] text-black mx-auto px-5 flex mt-20 mb-20 lg:mb-5 lg:justify-end lg:flex-row flex-col-reverse border-b ">
           <div className="w-full lg:border-b border-black"></div>
           <div className="w-full  border-t lg:border-t-0 border-b border-black">
@@ -317,7 +321,7 @@ const WorkDetail = () => {
               </div>
             </FadeInSection>
             <FadeInSection delay={0.3}>
-              <div className="w-full flex  py-2 lg:py-5 ">
+              <div className="w-full flex py-2 lg:py-5 lg:px-5 ">
                 <div className="w-[35%]">CREDITS</div>
                 <div className="w-full font-medium">
                   {work.credits.map((creditsItem, index) => (
@@ -338,38 +342,86 @@ const WorkDetail = () => {
           </div>
         </div>
 
+        {/* Project Details */}
+        <div className="w-full mx-auto lg:px-[10px]">
+          {work.images.map((image) => (
+            <div key={image.id} className="mb-[10px]">
+              <FadeInSection delay={0.3}>
+                {renderImage(image.type, image.imageUrl)}
+              </FadeInSection>
+            </div>
+          ))}
+        </div>
+
         {/* More Works */}
-        <div className="mb-20 lg:mb-40 px-5">
+        <div className="mt-[40px] mb-[80px] lg:mt-[20px] lg:mb-[100px] lg:pt-[10px] w-full ">
           <FadeInSection delay={0.3}>
-            <h2 className="  lg:text-[20px] text-[16px] font-bold text-left mb-10 text-black">
+            <h2 className="px-[10px] lg:text-[20px] text-[16px] text-black font-bold text-left mb-[10px] ">
+              <div className="w-full hidden lg:block lg:pt-[20px] lg:border-t border-black"></div>
               MORE WORKS
             </h2>
           </FadeInSection>
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
-            {work.relatedWorks.map((work, index) => (
-              <Link to={`/works/${work.id}`} className="workItem">
-                <FadeInSection delay={0.3 + (index + 1) * 0.1}>
-                  <div className="overflow-hidden">
+          <div className="w-full">
+            <Swiper
+              slidesPerView={2.2}
+              spaceBetween={10}
+              className="w-full px-[10px]"
+              breakpoints={{
+                320: {
+                  slidesPerView: 1.2,
+                  spaceBetween: 10,
+                },
+                768: {
+                  slidesPerView: 2.1,
+                  spaceBetween: 10,
+                },
+              }}
+            >
+              {work.relatedWorks.map((workItem, index) => (
+                <SwiperSlide key={`second-row-${index}`}>
+                  <Link to={`/works/${workItem.id}`} className="workItem block">
                     <div className="overflow-hidden">
-                      <img
-                        src={work.imageUrl}
-                        alt={work.title}
-                        className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
-                      />
-                    </div>
-                    <div className="mt-[20px] flex justify-between workInfo">
-                      <div className="text-black">
-                        <span className="pre">I</span>
-                        <span className="workTitle">{work.title}</span>
-                        <span className="divider">&nbsp;I&nbsp;</span>
-                        <span>{work.client}</span>
+                      <div className="overflow-hidden relative">
+                        <img
+                          src={workItem.imageUrl}
+                          alt={workItem.title}
+                          className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                        />
+                        <div
+                          className="absolute top-0 left-0 w-full h-full flex flex-col items-start justify-end uppercase px-[15px] py-5"
+                          style={{
+                            background:
+                              "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%)",
+                          }}
+                        >
+                          {workItem.categories
+                            .slice() // Create a copy to avoid mutating the original array
+                            .sort((a, b) => b.length - a.length) // Sort by length descending (longest first)
+                            .map((category, catIndex) => {
+                              return (
+                                <div
+                                  key={`category-${catIndex}`}
+                                  className={`text-white leading-none`}
+                                >
+                                  {category}
+                                </div>
+                              );
+                            })}
+                        </div>
                       </div>
-                      <div className="text-[#B4B4B4]">{work.category}</div>
+                      <div className="mt-[10px] flex justify-between workInfo">
+                        <div className="text-black">
+                          <span className="pre">I</span>
+                          <span className="workTitle">{workItem.title}</span>
+                          <span className="divider">&nbsp;I&nbsp;</span>
+                          <span>{workItem.client}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </FadeInSection>
-              </Link>
-            ))}
+                  </Link>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         </div>
       </div>

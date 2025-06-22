@@ -91,7 +91,7 @@ const Navigation = ({ deviceType }) => {
         <header
           className={`bg-white fixed z-50 w-full text-black h-[62px] flex items-center`}
         >
-          <nav className="w-full mx-auto py-4 px-5 flex justify-between items-center">
+          <nav className="w-full mx-auto py-4 px-[10px] flex justify-between items-center">
             <Link
               to="/"
               id="logoParallel"
@@ -165,7 +165,7 @@ const Navigation = ({ deviceType }) => {
       ) : (
         <>
           <header className={`bg-white fixed z-50 w-full text-black`}>
-            <nav className="w-full mx-auto py-4 px-[20px] flex justify-between items-center">
+            <nav className="w-full mx-auto py-4 px-[10px] flex justify-between items-center">
               <Link to="/" onClick={() => setMobileMenuOpen(false)}>
                 <img
                   className=" invert"

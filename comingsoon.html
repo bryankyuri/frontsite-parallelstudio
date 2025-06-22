@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coming Soon - Parallel Studio</title>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@1.5.7/dist/lottie-player.js"></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #000000;
+        font-family: Arial, sans-serif;
+        color: white;
+      }
+      .container {
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      #lottie-container {
+        cursor: pointer;
+        margin: auto;
+        width: auto;
+        height: 75px;
+      }
+      #lottiePlayer {
+        filter: invert(1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="lottie-container">
+        <lottie-player
+          id="lottiePlayer"
+          src="/lottie.json"
+          background="transparent"
+          speed="1"
+          loop
+          style="width: auto; height: 75px;"
+        >
+        </lottie-player>
+      </div>
+      <div></div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const lottiePlayer = document.getElementById('lottiePlayer');
+        const lottieContainer = document.getElementById('lottie-container');
+        let animationFrameId;
+        
+        // Add event listeners for mouse enter and leave
+        lottieContainer.addEventListener('mouseenter', function() {
+          // Cancel any ongoing reverse animation check
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+          }
+          
+          // Set direction to forward and play
+          lottiePlayer.setDirection(1);
+          lottiePlayer.play();
+        });
+        
+        lottieContainer.addEventListener('mouseleave', function() {
+          // Set the animation to play in reverse
+          lottiePlayer.setDirection(-1);
+          lottiePlayer.play();
+          
+          // Function to check if animation reached beginning
+          const checkAnimationProgress = () => {
+            // If currentFrame is very close to 0, stop the animation
+            if (lottiePlayer.currentFrame <= 1) {
+              lottiePlayer.stop();
+              lottiePlayer.seek(0);
+              animationFrameId = null;
+            } else {
+              // Otherwise continue checking
+              animationFrameId = requestAnimationFrame(checkAnimationProgress);
+            }
+          };
+          
+          // Start checking animation progress
+          animationFrameId = requestAnimationFrame(checkAnimationProgress);
+        });
+        
+        // Initialize lottie in a stopped state
+        lottiePlayer.addEventListener('ready', function() {
+          lottiePlayer.pause();
+        });
+      });
+    </script>
+  </body>
+</html>
