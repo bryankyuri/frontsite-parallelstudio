@@ -33,28 +33,28 @@ const About = () => {
       id: "02",
       title: "REMOTE COLOR GRADING",
       description:
-        "Our infrastructure allows our color artists to work in every format—2K, 4K, DPX, Open EXR, .r3dnative, anything you can bring to our shop—and tailor the look for any delivery specification. Allstudios are designed to work in any and every workflow & format you need, from the traditional standard of ACES, 10-bit DPX to 16-bit Open EXR.",
+        " Our team are keen to work with fellow artists and storytellers around the globe. With todays technology we are not bound to physical meetings. Work with us. From your couch.",
     },
     {
       id: "03",
       title: "ONLINE EDITING (VFX)",
       description:
-        "Our infrastructure allows our color artists to work in every format—2K, 4K, DPX, Open EXR, .r3dnative, anything you can bring to our shop—and tailor the look for any delivery specification. Allstudios are designed to work in any and every workflow & format you need, from the traditional standard of ACES, 10-bit DPX to 16-bit Open EXR.",
+         "Our studio is home to a dynamic team of 2D artists, designers, motion graphics specialists, compositors, and 3D artists, all dedicated to bringing your vision to life through exceptional visual effects and post-production artistry.",
     },
     {
       id: "04",
       title: "DRY HIRE",
       description:
-        "Our infrastructure allows our color artists to work in every format—2K, 4K, DPX, Open EXR, .r3dnative, anything you can bring to our shop—and tailor the look for any delivery specification. Allstudios are designed to work in any and every workflow & format you need, from the traditional standard of ACES, 10-bit DPX to 16-bit Open EXR.",
+        " For artists and collaborators who are looking for workplace to finish their projects. Local and foreign people who are happen to stay in Indonesia are welcome in our place.",
     },
   ];
 
   const team = [
     {
       id: "01",
-      name: "YOUR NAME",
-      jobDesk: "JOBDESK",
-      imgUrl: "/assets/team/team_1.jpg",
+      name: "Dwi Agung Pambudi",
+      jobDesk: "Managing Director, Co-founder",
+      imgUrl: "/assets/team/new/team_1.jpg",
     },
     {
       id: "02",
@@ -64,15 +64,15 @@ const About = () => {
     },
     {
       id: "03",
-      name: "YOUR NAME",
-      jobDesk: "JOBDESK",
-      imgUrl: "/assets/team/team_3.jpg",
+      name: "Kenzo Miyake",
+      jobDesk: "Senior Colorist, Co-founder",
+      imgUrl: "/assets/team/new/team_2.jpg",
     },
     {
       id: "04",
-      name: "YOUR NAME",
-      jobDesk: "JOBDESK",
-      imgUrl: "/assets/team/team_4.jpg",
+      name: "Yuda Gustian",
+      jobDesk: "Executive Producer",
+      imgUrl: "/assets/team/new/team_3.jpg",
     },
     {
       id: "05",
@@ -82,9 +82,9 @@ const About = () => {
     },
     {
       id: "06",
-      name: "YOUR NAME",
-      jobDesk: "JOBDESK",
-      imgUrl: "/assets/team/team_6.jpg",
+      name: "Fian Firyanto",
+      jobDesk: "Finance",
+      imgUrl: "/assets/team/new/team_4.jpg",
     },
     {
       id: "07",
@@ -94,27 +94,27 @@ const About = () => {
     },
     {
       id: "08",
-      name: "YOUR NAME",
-      jobDesk: "JOBDESK",
-      imgUrl: "/assets/team/team_8.jpg",
+      name: "M. Irvan Setiawan",
+      jobDesk: "Senior VFX artist, Compositor",
+      imgUrl: "/assets/team/new/team_5.jpg",
     },
     {
       id: "09",
-      name: "YOUR NAME",
-      jobDesk: "JOBDESK",
-      imgUrl: "/assets/team/team_9.jpg",
+      name: "Alvin Rizkyadi",
+      jobDesk: "Junior Colorist",
+      imgUrl: "/assets/team/new/team_6.jpg",
     },
     {
       id: "10",
-      name: "YOUR NAME",
-      jobDesk: "JOBDESK",
-      imgUrl: "/assets/team/team_10.jpg",
+      name: "Michael Thung",
+      jobDesk: "Junior VFX artist",
+      imgUrl: "/assets/team/new/team_7.jpg",
     },
     {
       id: "11",
-      name: "YOUR NAME",
-      jobDesk: "JOBDESK",
-      imgUrl: "/assets/team/team_11.jpg",
+      name: "Irwan Syahrani",
+      jobDesk: "Post Producer",
+      imgUrl: "/assets/team/new/team_8.jpg",
     },
     {
       id: "12",
@@ -298,7 +298,9 @@ const About = () => {
       <section className="services py-20" id="our-services">
         <div className="w-full px-[10px]">
           <FadeInSection delay={0.3}>
-            <h2 className="  lg:text-[20px] text-[16px] font-bold mb-5 text-black">OUR TEAM</h2>
+            <h2 className="  lg:text-[20px] text-[16px] font-bold mb-5 text-black">
+              OUR TEAM
+            </h2>
           </FadeInSection>
           <div className="grid lg:grid-cols-4 grid-cols-2 gap-x-[10px] gap-y-5">
             {team.map((member) => (
@@ -311,10 +313,10 @@ const About = () => {
                       className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
                     />
                   </div>
-                  <h3 className="text-[16px] font-medium mt-5 text-black leading-[100%]">
+                  <h3 className="text-[16px] font-medium mt-5 text-black leading-[100%] uppercase">
                     {member.name}
                   </h3>
-                  <p className="text-[#787878] text-[16px] leading-[100%]">
+                  <p className="text-[#787878] text-[16px] leading-[100%] uppercase">
                     {member.jobDesk}
                   </p>
                 </div>
@@ -382,7 +384,9 @@ const About = () => {
                     )}
                     <div
                       className={`h-[16px] w-[16px] flex justify-center items-center ${
-                        openAccordionsJob === jobItem.id ? "invert rotate-180" : ""
+                        openAccordionsJob === jobItem.id
+                          ? "invert rotate-180"
+                          : ""
                       } transition-all duration-[0.3s]`}
                     >
                       <IconTriangle />

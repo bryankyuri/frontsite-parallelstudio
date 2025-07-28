@@ -34,8 +34,8 @@ const Home = () => {
       image: "/assets/works/work1.jpg", // Replace with your image path
       title: "PILLOW WALK",
       client: "ALDO",
-      categories: ["COLOR GRADING", "REMOTE GRADING", "COMPUTER GRAPHIC"],
-      videoUrl: "https://cdn.jasonbradley.co/pic/6e1d7d78%20(1).mp4",
+      categories: ["COLOR GRADING"],
+      videoUrl: "https://videos.virtual-app.my.id/aldo_pillow_walk.mp4",
       position: 0,
     },
     {
@@ -43,8 +43,8 @@ const Home = () => {
       image: "/assets/works/work2.jpg",
       title: "TOKOPEDIA",
       client: "RAMADAN 2024",
-      categories: ["MOTION GRAPHIC", "COMPUTER GRAPHIC"],
-      videoUrl: "https://cdn.jasonbradley.co/pic/cafd3e4d.mp4",
+      categories: ["COLOR GRADING", "VFX"],
+      videoUrl: "https://videos.virtual-app.my.id/tokpedia_ramadhan.mp4",
       position: 0,
     },
     {
@@ -52,17 +52,17 @@ const Home = () => {
       image: "/assets/works/work3.jpg",
       title: "TRUST IN GOLD",
       client: "UBS GOLD",
-      categories: ["DRY HIRE", "REMOTE GRADING", "COMPUTER GRAPHIC"],
-      videoUrl: "https://cdn.jasonbradley.co/pic/1e50e423-e10aee53.mp4",
+      categories: ["COLOR GRADING"],
+      videoUrl: "https://videos.virtual-app.my.id/ubs_gold.mp4",
       position: 0,
     },
     {
       id: 4,
       image: "/assets/works/work4.jpg",
-      title: "SPEAK TO ME",
-      client: "SOCIOLLA",
-      categories: ["MOTION GRAPHIC", "COMPUTER GRAPHIC", "REMOTE GRADING"],
-      videoUrl: "https://cdn.jasonbradley.co/pic/3253312293.mp4",
+      title: "GRABFOOD DINE OUT",
+      client: "GRAB",
+      categories: ["COLOR GRADING", "VFX", "MOTION GRAPHIC"],
+      videoUrl: "https://videos.virtual-app.my.id/grab_dineout.mp4",
       position: 0,
     },
   ]);
@@ -812,22 +812,38 @@ const Home = () => {
                 paddingBottom:
                   deviceType === "desktop"
                     ? "calc(56.25% - 62px)"
-                    : // : "calc(177.78% - 66px)", // 16:9 for desktop, 9:16 for mobile
-                      "calc(86.25% - 62px)",
+                    : "calc(86.25% - 62px)",
               }}
             >
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src={
-                  deviceType === "desktop"
-                    ? "https://www.youtube.com/embed/dQw4w9WgXcQ" // Regular YouTube video
-                    : // : "https://www.youtube.com/embed/K3GS-KFp5Yc" // YouTube Shorts video
-                      "https://www.youtube.com/embed/dQw4w9WgXcQ"
-                }
-                title="Showreel Video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+              <video
+                className="absolute top-0 left-0 w-full h-full object-cover"
+                src="https://videos.virtual-app.my.id/SHOWREEL_2024_Q4%20.mp4"
+                controls
+                controlsList="nodownload noplaybackrate"
+                playsInline
+                preload="metadata"
+                style={{ borderRadius: "0px" }}
+                onError={(e) => {
+                  console.log("Showreel video failed to load:", e);
+                }}
+                onLoadedData={() => {
+                  console.log("Showreel video loaded successfully");
+                }}
+                onPlay={(e) => {
+                  // Auto fullscreen when video starts playing
+                  if (e.target.requestFullscreen) {
+                    e.target.requestFullscreen().catch((err) => {
+                      console.log("Fullscreen request failed:", err);
+                    });
+                  } else if (e.target.webkitRequestFullscreen) {
+                    e.target.webkitRequestFullscreen();
+                  } else if (e.target.msRequestFullscreen) {
+                    e.target.msRequestFullscreen();
+                  }
+                }}
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </FadeInSection>
