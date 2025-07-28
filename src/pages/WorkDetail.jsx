@@ -367,22 +367,38 @@ const WorkDetail = () => {
                 paddingBottom:
                   deviceType === "desktop"
                     ? "calc(56.25% - 62px)"
-                    : // : "calc(177.78% - 66px)", // 16:9 for desktop, 9:16 for mobile
-                      "calc(86.25% - 62px)",
+                    : "calc(86.25% - 62px)",
               }}
             >
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src={
-                  deviceType === "desktop"
-                    ? "https://www.youtube.com/embed/dQw4w9WgXcQ" // Regular YouTube video
-                    : // : "https://www.youtube.com/embed/K3GS-KFp5Yc" // YouTube Shorts video
-                      "https://www.youtube.com/embed/dQw4w9WgXcQ"
-                }
-                title="Showreel Video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+              <video
+                className="absolute top-0 left-0 w-full h-full object-cover"
+                src="https://videos.virtual-app.my.id/tokpedia_ramadhan.mp4"
+                controls
+                controlsList="nodownload noplaybackrate"
+                playsInline
+                preload="metadata"
+                style={{ borderRadius: "0px" }}
+                onError={(e) => {
+                  console.log("Showreel video failed to load:", e);
+                }}
+                onLoadedData={() => {
+                  console.log("Showreel video loaded successfully");
+                }}
+                onPlay={(e) => {
+                  // Auto fullscreen when video starts playing
+                  if (e.target.requestFullscreen) {
+                    e.target.requestFullscreen().catch((err) => {
+                      console.log("Fullscreen request failed:", err);
+                    });
+                  } else if (e.target.webkitRequestFullscreen) {
+                    e.target.webkitRequestFullscreen();
+                  } else if (e.target.msRequestFullscreen) {
+                    e.target.msRequestFullscreen();
+                  }
+                }}
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </FadeInSection>

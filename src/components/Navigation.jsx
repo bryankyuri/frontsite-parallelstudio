@@ -1,90 +1,46 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
-import {
-  IconA1,
-  IconA2,
-  IconD,
-  IconE,
-  IconI,
-  IconL1,
-  IconL2,
-  IconL3,
-  IconL4,
-  IconL5,
-  IconL6,
-  IconO,
-  IconP,
-  IconR,
-  IconS,
-  IconT,
-  IconU,
-} from "./Icon/LogoCharacters";
+import Lottie from "lottie-react";
+import logoLottieData from "../components/Icon/logo/logo_lottie.json"; // Move file to src and import from there
 
 const Navigation = ({ deviceType }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // Track animation step (0-4) and hover state
-  const [animationStep, setAnimationStep] = useState(0);
-  const [isHovering, setIsHovering] = useState(false);
-  const animationTimerRef = useRef(null);
-
-  // Animation durations for each step (in ms)
-  const stepDurations = [0, 600, 450, 450, 600];
+  const lottieRef = useRef();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Handle mouse events
+  // Handle mouse events for Lottie animation
   const handleMouseEnter = () => {
-    setIsHovering(true);
-    // Start the animation sequence by moving to step 1
-    if (animationStep === 0) {
-      setAnimationStep(1);
+    if (lottieRef.current) {
+      lottieRef.current.setDirection(1);
+      lottieRef.current.play();
     }
   };
 
   const handleMouseLeave = () => {
-    setIsHovering(false);
-    // Return to idle state
-    setAnimationStep(0);
-
-    // Clear any pending timers
-    if (animationTimerRef.current) {
-      clearTimeout(animationTimerRef.current);
-      animationTimerRef.current = null;
+    if (lottieRef.current) {
+      lottieRef.current.setDirection(-1);
+      lottieRef.current.play();
+      
+      // Function to check if animation reached beginning
+      const checkAnimationProgress = () => {
+        if (lottieRef.current && lottieRef.current.animationItem) {
+          const currentFrame = lottieRef.current.animationItem.currentFrame;
+          if (currentFrame <= 1) {
+            lottieRef.current.stop();
+            lottieRef.current.goToAndStop(0, true);
+          } else {
+            requestAnimationFrame(checkAnimationProgress);
+          }
+        }
+      };
+      
+      requestAnimationFrame(checkAnimationProgress);
     }
   };
 
-  // Effect to manage animation progression
-  useEffect(() => {
-    // Skip for idle state (step 0)
-    if (animationStep === 0) return;
-
-    // Set timer for current step
-    animationTimerRef.current = setTimeout(() => {
-      // If still hovering, advance to next step or loop back to step 1
-      if (isHovering) {
-        if (animationStep < 3) {
-          setAnimationStep(animationStep + 1);
-        } else {
-          // After step 4, go back to step 1 to create a loop
-          setAnimationStep(1);
-        }
-      } else {
-        // If no longer hovering, return to idle
-        setAnimationStep(0);
-      }
-    }, stepDurations[animationStep]);
-
-    // Cleanup function to clear timer if component unmounts or step changes
-    return () => {
-      if (animationTimerRef.current) {
-        clearTimeout(animationTimerRef.current);
-      }
-    };
-  }, [animationStep, isHovering]);
-
-  console.log(`${animationStep}`);
   return (
     <>
       {deviceType === "desktop" ? (
@@ -95,41 +51,23 @@ const Navigation = ({ deviceType }) => {
             <Link
               to="/"
               id="logoParallel"
-              className={`text-xl font-bold flex step-${animationStep} justify-center items-center w-[197px]`}
+              className="text-xl font-bold flex justify-center items-center w-[196px] cursor-pointer"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
-              <IconP />
-              <IconA1 />
-              <IconR />
-              <IconA2 />
-              <div className="flex relative l-container overflow-hidden">
-                <div className="overflow-hidden l-wrapper">
-                  <IconL1 />
-                </div>
-                <div className="overflow-hidden l-wrapper">
-                  <IconL2 />
-                </div>
-                <div className="overflow-hidden l-wrapper">
-                  <IconL3 />
-                </div>
-                <div className="overflow-hidden l-wrapper">
-                  <IconL4 />
-                </div>
-                <div className="overflow-hidden l-wrapper">
-                  <IconL5 />
-                </div>
-                <div className="rectangle absolute left-[0.5px] top-[0.1px] h-[15.8px] bg-black" />
-              </div>
-              <IconE />
-              <IconL6 />
-              <span className="w-[7px]"></span>
-              <IconS />
-              <IconT />
-              <IconU />
-              <IconD />
-              <IconI />
-              <IconO />
+              <Lottie
+                lottieRef={lottieRef}
+                animationData={logoLottieData}
+                loop={false}
+                autoplay={false}
+                style={{ 
+                  width: '196px', 
+                  height: 'auto',
+                }}
+                onComplete={() => {
+                  // Optional: handle animation complete
+                }}
+              />
             </Link>
 
             <div className="space-x-5 uppercase text-[18px] font-medium">
@@ -167,12 +105,15 @@ const Navigation = ({ deviceType }) => {
           <header className={`bg-white fixed z-50 w-full text-black`}>
             <nav className="w-full mx-auto py-4 px-[10px] flex justify-between items-center">
               <Link to="/" onClick={() => setMobileMenuOpen(false)}>
-                <img
-                  className=" invert"
-                  src="/logo.png"
-                  alt="Logo"
-                  width={"198px"}
-                  height={"auto"}
+                <Lottie
+                  animationData={logoLottieData}
+                  loop={false}
+                  autoplay={false}
+                  style={{ 
+                    width: '196px', 
+                    height: 'auto',
+                    filter: 'invert(1)'
+                  }}
                 />
               </Link>
 
@@ -201,7 +142,7 @@ const Navigation = ({ deviceType }) => {
               </button>
             </nav>
           </header>
-          {/* Mobile menu drawer */}
+          
           <div
             className={`fixed inset-0 bg-white z-40 transition-transform duration-300 ease-in-out text-black ${
               mobileMenuOpen ? "translate-y-0" : "-translate-y-full"
