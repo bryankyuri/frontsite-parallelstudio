@@ -447,14 +447,14 @@ const WorkDetail = () => {
                           alt={workItem.title}
                           className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
                         />
-                        <div
+                        {/* <div
                           className="absolute top-0 left-0 w-full h-full flex flex-col items-start justify-end uppercase px-[15px] py-5"
                           style={{
                             background:
                               "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%)",
                           }}
-                        >
-                          {workItem.categories
+                        > */}
+                          {/* {workItem.categories
                             .slice() // Create a copy to avoid mutating the original array
                             .sort((a, b) => b.length - a.length) // Sort by length descending (longest first)
                             .map((category, catIndex) => {
@@ -466,8 +466,8 @@ const WorkDetail = () => {
                                   {category}
                                 </div>
                               );
-                            })}
-                        </div>
+                            })} */}
+                        {/* </div> */}
                       </div>
                       <div className="mt-[10px] flex justify-between workInfo">
                         <div className="text-black">

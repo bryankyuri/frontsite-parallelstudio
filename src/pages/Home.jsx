@@ -603,7 +603,7 @@ const Home = () => {
                             {project.client}
                           </div>
                           <div className="lg:w-full w-[80%]">
-                            {project.categories}
+                            {project.categories.join(", ")}
                           </div>
                         </>
                       )}
@@ -725,14 +725,14 @@ const Home = () => {
                             alt={work.title}
                             className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
                           />
-                          <div
+                          {/* <div
                             className="absolute top-0 left-0 w-full h-full flex flex-col items-start justify-end uppercase px-[15px] py-5"
                             style={{
                               background:
                                 "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%)",
                             }}
-                          >
-                            {work.categories
+                          > */}
+                            {/* {work.categories
                               .slice() // Create a copy to avoid mutating the original array
                               .sort((a, b) => b.length - a.length) // Sort by length descending (longest first)
                               .map((category, catIndex) => {
@@ -744,8 +744,8 @@ const Home = () => {
                                     {category}
                                   </div>
                                 );
-                              })}
-                          </div>
+                              })} */}
+                          {/* </div> */}
                         </div>
                         <div className="mt-[10px] flex justify-between workInfo">
                           <div className="text-black">
