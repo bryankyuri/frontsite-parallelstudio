@@ -9,6 +9,7 @@ lerna-debug.log*
 
 dev-dist
 node_modules
+.wrangler
 dist
 dist-ssr
 *.local
@@ -23,3 +24,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.zip
+*.tar.gz
+*.bat
+*.html
