@@ -19,6 +19,8 @@ const Works = () => {
     "cgi",
     "vfx",
   ];
+
+  const typeTag = ["film", "series"];
   const works = [
     {
       id: 1,
@@ -115,14 +117,14 @@ const Works = () => {
       id: 14,
       title: "PROJECT_NAME",
       client: "CLIENTS",
-      categories: ["color grading", "vfx"],
+      categories: ["color grading", "vfx", "series"],
       imageUrl: "/assets/works/work14.jpg",
     },
     {
       id: 15,
       title: "PROJECT_NAME",
       client: "CLIENTS",
-      categories: ["color grading", "motion graphic", "cgi"],
+      categories: ["color grading", "motion graphic", "cgi", "film"],
       imageUrl: "/assets/works/work15.jpg",
     },
   ];
@@ -174,7 +176,25 @@ const Works = () => {
         </FadeInSection>
 
         <FadeInSection delay={0.1}>
-          <div className="flex justify-center lg:mb-[151px] my-[117px] space-x-4">
+          <div className="flex justify-center mt-[117px] mb-8 space-x-4 ">
+            {typeTag.map((tag, index) => (
+              <button
+                key={index}
+                className={`px-4 py-2 rounded transition-all duration-200 ${
+                  activeFilters.includes(tag)
+                    ? "bg-black text-white"
+                    : "bg-[#F0F0F0] text-[#787878] hover:bg-gray-300"
+                }`}
+                onClick={() => handleFilterToggle(tag)}
+              >
+                {tag.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </FadeInSection>
+
+        <FadeInSection delay={0.1}>
+          <div className="flex justify-center lg:mb-[151px] mb-[117px] space-x-4">
             {deviceType === "desktop" ? (
               <>
                 {categories.map((category, index) => (
@@ -251,7 +271,7 @@ const Works = () => {
                             "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%)",
                         }}
                       > */}
-                        {/* {work.categories
+                      {/* {work.categories
                           .slice() // Create a copy to avoid mutating the original array
                           .sort((a, b) => b.length - a.length) // Sort by length descending (longest first)
                           .map((category, catIndex) => {

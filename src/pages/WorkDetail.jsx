@@ -19,6 +19,10 @@ const WorkDetail = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const animationRef = useRef(null);
 
+  // Add these state variables at the top of your component
+  const [popupImage, setPopupImage] = useState(null);
+  const [popupImageIndex, setPopupImageIndex] = useState(0);
+
   // Animation function for smooth slider transitions
   const animateSlider = (targetPosition) => {
     setIsAnimating(true);
@@ -73,16 +77,18 @@ const WorkDetail = () => {
     id: workId,
     title: "Video Title",
     client: "Client Name",
+    category: "film/series", // film/series, commercial
     year: "2024",
+    tag: ["MOTION GRAPHIC", "COLOR GRADING", "VFX", "CGI"],
     description:
-      "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.",
+      "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisi.",
     credits: [
-      { role: "Director", name: "Your Name" },
-      { role: "Producer", name: "Your Name" },
-      { role: "DOP", name: "Your Name" },
-      { role: "Colorist", name: "Your Name" },
-      { role: "Visual Effect", name: "Your Name" },
-      { role: "Motion Graphic", name: "Your Name" },
+      { role: "Director", name: ["Your Name"] },
+      { role: "Producer", name: ["Your Name", "Your Name"] },
+      { role: "DOP", name: ["Your Name", "Your Name"] },
+      { role: "Colorist", name: ["Your Name", "Your Name"] },
+      { role: "Visual Effect", name: ["Your Name", "Your Name", "Your Name"] },
+      { role: "Motion Graphic", name: ["Your Name", "Your Name"] },
     ],
     images: [
       {
@@ -166,6 +172,49 @@ const WorkDetail = () => {
       },
     ],
   };
+  // Add this function to handle image clicks
+  const handleImageClick = (imageUrl, index = 0) => {
+    setPopupImage(imageUrl);
+    setPopupImageIndex(index);
+    // Prevent body scroll when popup is open
+    document.body.style.overflow = "hidden";
+  };
+
+  // Add this function to close popup
+  const closePopup = () => {
+    setPopupImage(null);
+    setPopupImageIndex(0);
+    // Restore body scroll
+    document.body.style.overflow = "";
+  };
+
+  // Add keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!popupImage) return;
+
+      if (e.key === "Escape") {
+        closePopup();
+      } else if (
+        e.key === "ArrowLeft" &&
+        Array.isArray(popupImage) &&
+        popupImageIndex > 0
+      ) {
+        setPopupImageIndex(popupImageIndex - 1);
+      } else if (
+        e.key === "ArrowRight" &&
+        Array.isArray(popupImage) &&
+        popupImageIndex < popupImage.length - 1
+      ) {
+        setPopupImageIndex(popupImageIndex + 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [popupImage, popupImageIndex]);
+
+  // Update your renderImage function
   const renderImage = (type, imageUrl) => {
     switch (type) {
       case "full-width":
@@ -174,7 +223,8 @@ const WorkDetail = () => {
             <img
               src={imageUrl}
               alt={work.title}
-              className="w-full object-cover"
+              className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => handleImageClick(imageUrl)}
             />
           </div>
         );
@@ -186,13 +236,13 @@ const WorkDetail = () => {
                 key={index}
                 src={url}
                 alt={work.title}
-                className="w-full object-cover"
+                className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => handleImageClick(imageUrl, index)}
               />
             ))}
           </div>
         );
       case "compare-full":
-        console.log(sliderPosition);
         return (
           <div className="w-full relative">
             {/* Create a proper sticky container with background */}
@@ -222,45 +272,38 @@ const WorkDetail = () => {
 
             {/* The compare slider below the sticky header */}
             <div className="mt-[-40px]">
-              <ReactCompareSlider
-                itemOne={
-                  <ReactCompareSliderImage
-                    src={imageUrl[0]}
-                    alt="Before"
-                    className="w-full object-cover"
-                  />
-                }
-                itemTwo={
-                  <ReactCompareSliderImage
-                    src={imageUrl[1]}
-                    alt="After"
-                    className="w-full object-cover"
-                  />
-                }
-                position={sliderPosition}
-                onPositionChange={(position) => {
-                  if (!isAnimating) {
-                    setSliderPosition(position);
+              <div
+                className="cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => handleImageClick(imageUrl)}
+              >
+                <ReactCompareSlider
+                  itemOne={
+                    <ReactCompareSliderImage
+                      src={imageUrl[0]}
+                      alt="Before"
+                      className="w-full object-cover"
+                    />
                   }
-                }}
-                style={{
-                  height: "100%",
-                  width: "100%",
-                }}
-                onlyHandleDraggable={true}
-                // handle={
-                //   <div
-                //     style={{
-                //       width: '40px',
-                //       height: '40px',
-                //       border: '3px solid white',
-                //       borderRadius: '50%',
-                //       backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                //       boxShadow: '0 0 5px rgba(0, 0, 0, 0.5)'
-                //     }}
-                //   />
-                // }
-              />
+                  itemTwo={
+                    <ReactCompareSliderImage
+                      src={imageUrl[1]}
+                      alt="After"
+                      className="w-full object-cover"
+                    />
+                  }
+                  position={sliderPosition}
+                  onPositionChange={(position) => {
+                    if (!isAnimating) {
+                      setSliderPosition(position);
+                    }
+                  }}
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                  }}
+                  onlyHandleDraggable={true}
+                />
+              </div>
             </div>
           </div>
         );
@@ -272,7 +315,8 @@ const WorkDetail = () => {
                 key={index}
                 src={url}
                 alt={work.title}
-                className="w-full object-cover"
+                className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => handleImageClick(imageUrl, index)}
               />
             ))}
           </div>
@@ -281,6 +325,77 @@ const WorkDetail = () => {
         return null;
     }
   };
+
+  // Add the ImagePopup component here, before the return statement
+  const ImagePopup = () => {
+    if (!popupImage) return null;
+
+    const isArrayImage = Array.isArray(popupImage);
+    const currentImage = isArrayImage
+      ? popupImage[popupImageIndex]
+      : popupImage;
+
+    return (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+        onClick={closePopup}
+      >
+        <div className="relative max-w-full max-h-full">
+          {/* Close button */}
+          <button
+            onClick={closePopup}
+            className="absolute top-4 right-4 text-white text-2xl z-10 hover:opacity-70 transition-opacity"
+          >
+            ✕
+          </button>
+
+          {/* Navigation arrows for array images */}
+          {isArrayImage && popupImage.length > 1 && (
+            <>
+              {popupImageIndex > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPopupImageIndex(popupImageIndex - 1);
+                  }}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:opacity-70 transition-opacity z-10"
+                >
+                  ‹
+                </button>
+              )}
+              {popupImageIndex < popupImage.length - 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPopupImageIndex(popupImageIndex + 1);
+                  }}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:opacity-70 transition-opacity z-10"
+                >
+                  ›
+                </button>
+              )}
+            </>
+          )}
+
+          {/* Image counter for array images */}
+          {isArrayImage && popupImage.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
+              {popupImageIndex + 1} / {popupImage.length}
+            </div>
+          )}
+
+          {/* Main image */}
+          <img
+            src={currentImage}
+            alt={work.title}
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.workDetail}>
       <div className="w-full mx-auto">
@@ -299,11 +414,26 @@ const WorkDetail = () => {
             backgroundRepeat: "no-repeat",
           }}
         ></div>
+        <div className="w-full px-5">
+          <div className="flex gap-2">
+            <div className="font-semibold text-white bg-black px-2 py-1 rounded-[4px]">
+              #
+            </div>
+            {work.tag.map((item, index) => (
+              <div
+                key={index}
+                className="font-semibold text-white bg-black px-2 py-1 rounded-[4px]"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
         <div className="w-full lg:text-[20px] text-[14px] text-black mx-auto px-5 flex my-[20px] lg:justify-end lg:flex-row flex-col-reverse border-b ">
           <div className="w-full  border-t lg:border-t-0 border-b border-black">
             <FadeInSection delay={0.3}>
               <div className="w-full flex border-b border-black py-2 lg:py-5">
-                <div className="w-[68px] lg:mr-[52px] mr-[24px]">CLIENT</div>
+                <div className="w-[68px] lg:mr-[60px] mr-[24px]">CLIENT</div>
                 <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium">
                   {work.client}
                 </div>
@@ -311,7 +441,7 @@ const WorkDetail = () => {
             </FadeInSection>
             <FadeInSection delay={0.3}>
               <div className="w-full flex border-b border-black py-2 lg:py-5">
-                <div className="w-[68px] lg:mr-[52px] mr-[24px] ">TITLE</div>
+                <div className="w-[68px] lg:mr-[60px] mr-[24px] ">TITLE</div>
                 <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium">
                   {work.title}
                 </div>
@@ -319,7 +449,15 @@ const WorkDetail = () => {
             </FadeInSection>
             <FadeInSection delay={0.3}>
               <div className="w-full flex border-b border-black py-2 lg:py-5">
-                <div className="w-[68px] lg:mr-[52px] mr-[24px] ">DESC.</div>
+                <div className="w-[68px] lg:mr-[60px] mr-[24px] ">CATEGORY</div>
+                <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium capitalize">
+                  {work.category}
+                </div>
+              </div>
+            </FadeInSection>
+            <FadeInSection delay={0.3}>
+              <div className="w-full flex border-b border-black py-2 lg:py-5">
+                <div className="w-[68px] lg:mr-[60px] mr-[24px] ">DESC.</div>
                 <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] text-justify font-medium">
                   {work.description}
                 </div>
@@ -327,7 +465,7 @@ const WorkDetail = () => {
             </FadeInSection>
             <FadeInSection delay={0.3}>
               <div className="w-full flex pt-2 lg:pt-5 ">
-                <div className="w-[68px] lg:mr-[52px] mr-[24px]">CREDITS</div>
+                <div className="w-[68px] lg:mr-[60px] mr-[24px]">CREDITS</div>
                 <div className="w-full  font-medium">
                   {work.credits.map((creditsItem, index) => (
                     <div
@@ -341,8 +479,14 @@ const WorkDetail = () => {
                       <div
                         className={`lg:w-[calc(50%-120px)] w-[calc(100%-76px)] grid grid-cols-2 gap-2`}
                       >
-                        <div className="w-full">{creditsItem.name}</div>
                         <div className="w-full">{creditsItem.role}</div>
+                        <div className="w-full grid grid-cols-1 gap-y-4">
+                          {creditsItem.name.map((item, index) => (
+                            <div key={index}>
+                              {item}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -454,7 +598,7 @@ const WorkDetail = () => {
                               "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%)",
                           }}
                         > */}
-                          {/* {workItem.categories
+                        {/* {workItem.categories
                             .slice() // Create a copy to avoid mutating the original array
                             .sort((a, b) => b.length - a.length) // Sort by length descending (longest first)
                             .map((category, catIndex) => {
@@ -485,6 +629,9 @@ const WorkDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Add this popup component at the end of your return statement, before the closing </div> */}
+      <ImagePopup />
     </div>
   );
 };

@@ -115,7 +115,7 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 3000,
+    port: 5173,
     host: '0.0.0.0', // Allow connections from any IP
     strictPort: true, // Don't try another port if 3000 is in use
     hmr: true, // Enable Hot Module Replacement for auto-refresh
