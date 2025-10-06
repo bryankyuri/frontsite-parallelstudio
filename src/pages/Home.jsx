@@ -18,10 +18,15 @@ import { FadeInSection } from "../components/FadeInSection";
 import { video } from "framer-motion/client";
 import { debounce } from "lodash";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useGoogleAnalytics } from "../hooks/useGoogleAnalytics";
 import "swiper/css";
 
 const Home = () => {
   const { vh, deviceType } = useContext(AppContext);
+  
+  // Initialize basic Google Analytics page tracking
+  useGoogleAnalytics();
+  
   // Default to null so no accordion is open by default
   const [activeProject, setActiveProject] = useState(0);
   // Track which project image to display (default to first)
@@ -717,7 +722,10 @@ const Home = () => {
               >
                 {dataWorks.map((work, index) => (
                   <SwiperSlide key={`second-row-${index}`}>
-                    <Link to={`/works/${work.id}`} className="workItem block">
+                    <Link 
+                      to={`/works/${work.id}`} 
+                      className="workItem block"
+                    >
                       <div className="overflow-hidden">
                         <div className="overflow-hidden relative">
                           <img
