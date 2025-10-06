@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import styles from "../styles/WorkDetail.module.scss";
 import stylesWork from "../styles/Works.module.scss";
 import { AppContext } from "../context/AppContext";
+import { useWorkDetail } from "../hooks/useWorkDetail";
 import {
   ReactCompareSlider,
   ReactCompareSliderImage,
@@ -22,6 +23,18 @@ const WorkDetail = () => {
   // Add these state variables at the top of your component
   const [popupImage, setPopupImage] = useState(null);
   const [popupImageIndex, setPopupImageIndex] = useState(0);
+
+  // Fetch work detail using TanStack Query (includes related works)
+  const {
+    data: workDetailData,
+    isLoading: isLoadingWork,
+    error: workError,
+    isError: isWorkError,
+  } = useWorkDetail(workId);
+
+  // Extract work and related works from the API response
+  const work = workDetailData?.work;
+  const relatedWorksData = workDetailData?.relatedWorks;
 
   // Animation function for smooth slider transitions
   const animateSlider = (targetPosition) => {
@@ -72,106 +85,6 @@ const WorkDetail = () => {
     };
   }, []);
 
-  // Mock data - in a real app, you would fetch this based on the workId
-  const work = {
-    id: workId,
-    title: "Video Title",
-    client: "Client Name",
-    category: "film/series", // film/series, commercial
-    year: "2024",
-    tag: ["MOTION GRAPHIC", "COLOR GRADING", "VFX", "CGI"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisi.",
-    credits: [
-      { role: "Director", name: ["Your Name"] },
-      { role: "Producer", name: ["Your Name", "Your Name"] },
-      { role: "DOP", name: ["Your Name", "Your Name"] },
-      { role: "Colorist", name: ["Your Name", "Your Name"] },
-      { role: "Visual Effect", name: ["Your Name", "Your Name", "Your Name"] },
-      { role: "Motion Graphic", name: ["Your Name", "Your Name"] },
-    ],
-    images: [
-      {
-        id: "01",
-        type: "full-width",
-        imageUrl: "/assets/workDetail/work1.jpg",
-      },
-      {
-        id: "02",
-        type: "2col-full",
-        imageUrl: [
-          "/assets/workDetail/work2.jpg",
-          "/assets/workDetail/work3.jpg",
-        ],
-      },
-      {
-        id: "03",
-        type: "2col-full",
-        imageUrl: [
-          "/assets/workDetail/work4.jpg",
-          "/assets/workDetail/work5.jpg",
-        ],
-      },
-      {
-        id: "04",
-        type: "compare-full",
-        imageUrl: [
-          "/assets/workDetail/work6B.jpg",
-          "/assets/workDetail/work6.jpg",
-        ],
-      },
-      {
-        id: "05",
-        type: "2col-4:5",
-        imageUrl: [
-          "/assets/workDetail/work7.jpg",
-          "/assets/workDetail/work8.jpg",
-        ],
-      },
-      {
-        id: "06",
-        type: "full-width",
-        imageUrl: "/assets/workDetail/work9.jpg",
-      },
-    ],
-    relatedWorks: [
-      {
-        id: 1,
-        title: "PROJECT_NAME",
-        client: "CLIENTS",
-        categories: ["motion graphic", "vfx", "color grading", "cgi"],
-        imageUrl: "/assets/works/work1.jpg",
-      },
-      {
-        id: 2,
-        title: "PROJECT_NAME",
-        client: "CLIENTS",
-        categories: ["motion graphic", "vfx", "color grading", "cgi"],
-        imageUrl: "/assets/works/work2.jpg",
-      },
-      {
-        id: 3,
-        title: "PROJECT_NAME",
-        client: "CLIENTS",
-        categories: ["motion graphic", "vfx", "color grading", "cgi"],
-        imageUrl: "/assets/works/work3.jpg",
-      },
-      {
-        id: 4,
-        title: "PROJECT_NAME",
-        client: "CLIENTS",
-        categories: ["motion graphic", "vfx", "color grading", "cgi"],
-        imageUrl: "/assets/works/work4.jpg",
-      },
-      {
-        id: 5,
-        title: "PROJECT_NAME",
-        client: "CLIENTS",
-        categories: ["motion graphic", "vfx", "Color grading", "cgi"],
-        imageUrl: "/assets/works/work5.jpg",
-      },
-    ],
-  };
   // Add this function to handle image clicks
   const handleImageClick = (imageUrl, index = 0) => {
     setPopupImage(imageUrl);
@@ -216,26 +129,30 @@ const WorkDetail = () => {
 
   // Update your renderImage function
   const renderImage = (type, imageUrl) => {
+    // Add safety check for imageUrl
+    if (!imageUrl) return null;
+
     switch (type) {
       case "full-width":
         return (
           <div className="w-full">
             <img
               src={imageUrl}
-              alt={work.title}
+              alt={work?.title || "Work image"}
               className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
               onClick={() => handleImageClick(imageUrl)}
             />
           </div>
         );
       case "2col-full":
+        if (!Array.isArray(imageUrl) || imageUrl.length === 0) return null;
         return (
           <div className="grid grid-cols-2 gap-[10px]">
             {imageUrl.map((url, index) => (
               <img
                 key={index}
                 src={url}
-                alt={work.title}
+                alt={work?.title || "Work image"}
                 className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                 onClick={() => handleImageClick(imageUrl, index)}
               />
@@ -243,6 +160,7 @@ const WorkDetail = () => {
           </div>
         );
       case "compare-full":
+        if (!Array.isArray(imageUrl) || imageUrl.length < 2) return null;
         return (
           <div className="w-full relative">
             {/* Create a proper sticky container with background */}
@@ -308,13 +226,14 @@ const WorkDetail = () => {
           </div>
         );
       case "2col-4:5":
+        if (!Array.isArray(imageUrl) || imageUrl.length === 0) return null;
         return (
           <div className="grid grid-cols-2 gap-[10px]">
             {imageUrl.map((url, index) => (
               <img
                 key={index}
                 src={url}
-                alt={work.title}
+                alt={work?.title || "Work image"}
                 className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                 onClick={() => handleImageClick(imageUrl, index)}
               />
@@ -387,7 +306,7 @@ const WorkDetail = () => {
           {/* Main image */}
           <img
             src={currentImage}
-            alt={work.title}
+            alt={work?.title || "Work image"}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}
           />
@@ -395,6 +314,41 @@ const WorkDetail = () => {
       </div>
     );
   };
+
+  // Early returns for loading and error states
+  if (isLoadingWork) {
+    return (
+      <div className={styles.workDetail}>
+        <div className="w-full mx-auto">
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-black text-lg">Loading work details...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isWorkError || !work) {
+    return (
+      <div className={styles.workDetail}>
+        <div className="w-full mx-auto">
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <div className="text-black text-lg mb-4">
+                {workError?.message || "Work not found"}
+              </div>
+              <Link
+                to="/works"
+                className="inline-block bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
+              >
+                Back to Works
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.workDetail}>
@@ -406,7 +360,9 @@ const WorkDetail = () => {
               deviceType === "desktop"
                 ? "calc(100vh - 62px)"
                 : "calc(100vh - 66px)",
-            backgroundImage: `url('/hero-banner-detailwork.jpg')`,
+            backgroundImage: `url('${
+              work.hero_banner_image || "/hero-banner-detailwork.jpg"
+            }')`,
             backgroundSize:
               deviceType === "desktop" ? "100% auto" : "auto 100%",
             backgroundPosition:
@@ -419,14 +375,16 @@ const WorkDetail = () => {
             <div className="font-semibold text-white bg-black px-2 py-1 rounded-[4px]">
               #
             </div>
-            {work.tag.map((item, index) => (
-              <div
-                key={index}
-                className="font-semibold text-white bg-black px-2 py-1 rounded-[4px]"
-              >
-                {item}
-              </div>
-            ))}
+            {work.tags &&
+              Array.isArray(work.tags) &&
+              work.tags.map((item, index) => (
+                <div
+                  key={index}
+                  className="font-semibold text-white bg-black px-2 py-1 rounded-[4px]"
+                >
+                  {item}
+                </div>
+              ))}
           </div>
         </div>
         <div className="w-full lg:text-[20px] text-[14px] text-black mx-auto px-5 flex my-[20px] lg:justify-end lg:flex-row flex-col-reverse border-b ">
@@ -435,7 +393,7 @@ const WorkDetail = () => {
               <div className="w-full flex border-b border-black py-2 lg:py-5">
                 <div className="w-[68px] lg:mr-[60px] mr-[24px]">CLIENT</div>
                 <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium">
-                  {work.client}
+                  {work.client || "N/A"}
                 </div>
               </div>
             </FadeInSection>
@@ -443,7 +401,7 @@ const WorkDetail = () => {
               <div className="w-full flex border-b border-black py-2 lg:py-5">
                 <div className="w-[68px] lg:mr-[60px] mr-[24px] ">TITLE</div>
                 <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium">
-                  {work.title}
+                  {work.title || "N/A"}
                 </div>
               </div>
             </FadeInSection>
@@ -451,45 +409,59 @@ const WorkDetail = () => {
               <div className="w-full flex border-b border-black py-2 lg:py-5">
                 <div className="w-[68px] lg:mr-[60px] mr-[24px] ">CATEGORY</div>
                 <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium capitalize">
-                  {work.category}
+                  {work.category || "N/A"}
                 </div>
               </div>
             </FadeInSection>
-            <FadeInSection delay={0.3}>
-              <div className="w-full flex border-b border-black py-2 lg:py-5">
-                <div className="w-[68px] lg:mr-[60px] mr-[24px] ">DESC.</div>
-                <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] text-justify font-medium">
-                  {work.description}
+            {work.description && (
+              <FadeInSection delay={0.3}>
+                <div className="w-full flex border-b border-black py-2 lg:py-5">
+                  <div className="w-[68px] lg:mr-[60px] mr-[24px] ">DESC.</div>
+                  <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] text-justify font-medium">
+                    {work.description || "No description available"}
+                  </div>
                 </div>
-              </div>
-            </FadeInSection>
+              </FadeInSection>
+            )}
             <FadeInSection delay={0.3}>
               <div className="w-full flex pt-2 lg:pt-5 ">
                 <div className="w-[68px] lg:mr-[60px] mr-[24px]">CREDITS</div>
                 <div className="w-full  font-medium">
-                  {work.credits.map((creditsItem, index) => (
-                    <div
-                      className={`w-full ${
-                        work.credits.length - 1 !== index
-                          ? "pb-2 border-b border-black lg:pb-5 mb-2 lg:mb-5"
-                          : "pb-2 border-b border-black lg:pb-5"
-                        // "pb-2 border-b border-black lg:pb-5 mb-2 lg:mb-5"
-                      }`}
-                    >
+                  {work.credits && work.credits.length > 0 ? (
+                    work.credits.map((creditsItem, index) => (
                       <div
-                        className={`lg:w-[calc(50%-120px)] w-[calc(100%-76px)] grid grid-cols-2 gap-2`}
+                        key={index}
+                        className={`w-full ${
+                          work.credits.length - 1 !== index
+                            ? "pb-2 border-b border-black lg:pb-5 mb-2 lg:mb-5"
+                            : "pb-2 border-b border-black lg:pb-5"
+                          // "pb-2 border-b border-black lg:pb-5 mb-2 lg:mb-5"
+                        }`}
                       >
-                        <div className="w-full">{creditsItem.role}</div>
-                        <div className="w-full grid grid-cols-1 gap-y-4">
-                          {creditsItem.name.map((item, index) => (
-                            <div key={index}>
-                              {item}
-                            </div>
-                          ))}
+                        <div
+                          className={`lg:w-[calc(50%-120px)] w-[calc(100%-76px)] grid grid-cols-2 gap-2`}
+                        >
+                          <div className="w-full">{creditsItem.role}</div>
+                          <div className="w-full grid grid-cols-1 gap-y-4">
+                            {/* Handle corrected API structure: names (array) */}
+                            {creditsItem.names &&
+                            Array.isArray(creditsItem.names) &&
+                            creditsItem.names.length > 0 ? (
+                              creditsItem.names.map((item, nameIndex) => (
+                                <div key={nameIndex}>{item}</div>
+                              ))
+                            ) : (
+                              <div className="text-gray-500">Not specified</div>
+                            )}
+                          </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] text-gray-500">
+                      No credits available
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </FadeInSection>
@@ -497,7 +469,7 @@ const WorkDetail = () => {
               <div className="w-full flex border-b border-black py-2 lg:py-5">
                 <div className="w-[68px] lg:mr-[52px] mr-[24px] ">©</div>
                 <div className="lg:w-[calc(50%-120px)] w-[calc(100%-76px)] font-medium">
-                  {work.year}
+                  {work.year || "N/A"}
                 </div>
               </div>
             </FadeInSection>
@@ -516,7 +488,11 @@ const WorkDetail = () => {
             >
               <video
                 className="absolute top-0 left-0 w-full h-full object-cover"
-                src="https://videos.virtual-app.my.id/tokpedia_ramadhan.mp4"
+                src={
+                  work.video_project_src ||
+                  "https://videos.virtual-app.my.id/tokpedia_ramadhan.mp4"
+                }
+                poster={work.video_project_poster}
                 controls
                 controlsList="nodownload noplaybackrate"
                 playsInline
@@ -548,13 +524,21 @@ const WorkDetail = () => {
         </FadeInSection>
         {/* Project Details */}
         <div className="w-full mx-auto lg:px-[10px]">
-          {work.images.map((image) => (
-            <div key={image.id} className="mb-[10px]">
-              <FadeInSection delay={0.3}>
-                {renderImage(image.type, image.imageUrl)}
-              </FadeInSection>
+          {work.gallery_items && work.gallery_items.length > 0 ? (
+            work.gallery_items.map((item) => (
+              <div key={item.id} className="mb-[10px]">
+                <FadeInSection delay={0.3}>
+                  {item.images &&
+                    item.images.length > 0 &&
+                    renderImage(item.type, item.images)}
+                </FadeInSection>
+              </div>
+            ))
+          ) : (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-500">No project images available</div>
             </div>
-          ))}
+          )}
         </div>
 
         {/* More Works */}
@@ -566,66 +550,54 @@ const WorkDetail = () => {
             </h2>
           </FadeInSection>
           <div className="w-full">
-            <Swiper
-              slidesPerView={2.2}
-              spaceBetween={10}
-              className="w-full px-[10px]"
-              breakpoints={{
-                320: {
-                  slidesPerView: 1.2,
-                  spaceBetween: 10,
-                },
-                768: {
-                  slidesPerView: 2.1,
-                  spaceBetween: 10,
-                },
-              }}
-            >
-              {work.relatedWorks.map((workItem, index) => (
-                <SwiperSlide key={`second-row-${index}`}>
-                  <Link to={`/works/${workItem.id}`} className="workItem block">
-                    <div className="overflow-hidden">
-                      <div className="overflow-hidden relative">
-                        <img
-                          src={workItem.imageUrl}
-                          alt={workItem.title}
-                          className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
-                        />
-                        {/* <div
-                          className="absolute top-0 left-0 w-full h-full flex flex-col items-start justify-end uppercase px-[15px] py-5"
-                          style={{
-                            background:
-                              "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%)",
-                          }}
-                        > */}
-                        {/* {workItem.categories
-                            .slice() // Create a copy to avoid mutating the original array
-                            .sort((a, b) => b.length - a.length) // Sort by length descending (longest first)
-                            .map((category, catIndex) => {
-                              return (
-                                <div
-                                  key={`category-${catIndex}`}
-                                  className={`text-white leading-none`}
-                                >
-                                  {category}
-                                </div>
-                              );
-                            })} */}
-                        {/* </div> */}
-                      </div>
-                      <div className="mt-[10px] flex justify-between workInfo">
-                        <div className="text-black">
-                          <span className="pre">I</span>
-                          <span className="workTitle">{workItem.title}</span>
-                          <span className="divider">&nbsp;I&nbsp;</span>
-                          <span>{workItem.client}</span>
+            {relatedWorksData && relatedWorksData.length > 0 ? (
+              <Swiper
+                slidesPerView={2.2}
+                spaceBetween={10}
+                className="w-full px-[10px]"
+                breakpoints={{
+                  320: {
+                    slidesPerView: 1.2,
+                    spaceBetween: 10,
+                  },
+                  768: {
+                    slidesPerView: 2.1,
+                    spaceBetween: 10,
+                  },
+                }}
+              >
+                {relatedWorksData.map((workItem, index) => (
+                  <SwiperSlide key={`second-row-${index}`}>
+                    <Link
+                      to={`/works/${workItem.id}`}
+                      className="workItem block"
+                    >
+                      <div className="overflow-hidden">
+                        <div className="overflow-hidden relative">
+                          <img
+                            src={workItem.hero_banner_image}
+                            alt={workItem.title}
+                            className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                          />
+                        </div>
+                        <div className="mt-[10px] flex justify-between workInfo">
+                          <div className="text-black">
+                            <span className="pre">I</span>
+                            <span className="workTitle">{workItem.title}</span>
+                            <span className="divider">&nbsp;I&nbsp;</span>
+                            <span>{workItem.client}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+                    </Link>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-black">No related works found</div>
+              </div>
+            )}
           </div>
         </div>
       </div>

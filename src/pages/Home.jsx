@@ -5,8 +5,13 @@ import React, {
   useContext,
   useCallback,
 } from "react";
-import { useQuery } from "react-query";
-import { fetchData } from "../api/index";
+import { useQuery } from "@tanstack/react-query";
+import {
+  fetchData,
+  fetchLatestWorks,
+  fetchVideoBanners,
+  fetchWorks,
+} from "../api/index";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import styles from "../styles/Home.module.scss";
@@ -23,95 +28,79 @@ import "swiper/css";
 
 const Home = () => {
   const { vh, deviceType } = useContext(AppContext);
-  
+
   // Initialize basic Google Analytics page tracking
   useGoogleAnalytics();
-  
+
   // Default to null so no accordion is open by default
   const [activeProject, setActiveProject] = useState(0);
   // Track which project image to display (default to first)
   const [activeImage, setActiveImage] = useState(0);
   const [scrollDirection, setScrollDirection] = useState(null);
   const [isWindowLocked, setIsWindowLocked] = useState(true);
-  const [projects, setProjects] = useState([
-    {
-      id: 1,
-      image: "/assets/works/work1.jpg", // Replace with your image path
-      title: "PILLOW WALK",
-      client: "ALDO",
-      categories: ["COLOR GRADING"],
-      videoUrl: "https://videos.virtual-app.my.id/aldo_pillow_walk.mp4",
-      position: 0,
-    },
-    {
-      id: 2,
-      image: "/assets/works/work2.jpg",
-      title: "TOKOPEDIA",
-      client: "RAMADAN 2024",
-      categories: ["COLOR GRADING", "VFX"],
-      videoUrl: "https://videos.virtual-app.my.id/tokpedia_ramadhan.mp4",
-      position: 0,
-    },
-    {
-      id: 3,
-      image: "/assets/works/work3.jpg",
-      title: "TRUST IN GOLD",
-      client: "UBS GOLD",
-      categories: ["COLOR GRADING"],
-      videoUrl: "https://videos.virtual-app.my.id/ubs_gold.mp4",
-      position: 0,
-    },
-    {
-      id: 4,
-      image: "/assets/works/work4.jpg",
-      title: "GRABFOOD DINE OUT",
-      client: "GRAB",
-      categories: ["COLOR GRADING", "VFX", "MOTION GRAPHIC"],
-      videoUrl: "https://videos.virtual-app.my.id/grab_dineout.mp4",
-      position: 0,
-    },
-  ]);
 
   // State to track scroll percentage
   const [scrollPercentage, setScrollPercentage] = useState(0);
 
-  const dataWorks = [
-    {
-      id: 1,
-      title: "PROJECT_NAME",
-      client: "CLIENTS",
-      categories: ["motion graphic", "vfx", "color grading", "cgi"],
-      imageUrl: "/assets/works/work1.jpg",
+  // React Query for video banners
+  const {
+    data: videoBannersData,
+    isLoading: isLoadingBanners,
+    error: bannersError,
+  } = useQuery({
+    queryKey: ['video-banners'],
+    queryFn: fetchVideoBanners,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v5)
+    select: (data) => {
+      // Transform API data to match component expectations
+      return data.map((banner, index) => ({
+        id: banner.work_id || banner.id,
+        image: banner.video_thumbnail || `/assets/works/work${index + 1}.jpg`,
+        title: banner.title,
+        client: banner.client,
+        tags: banner.categories || [],
+        videoUrl: banner.video_url,
+        position: 0,
+      }));
     },
-    {
-      id: 2,
-      title: "PROJECT_NAME",
-      client: "CLIENTS",
-      categories: ["motion graphic", "vfx", "color grading", "cgi"],
-      imageUrl: "/assets/works/work2.jpg",
+  });
+
+  // React Query for latest works
+  const {
+    data: latestWorksData,
+    isLoading: isLoadingWorks,
+    error: worksError,
+  } = useQuery({
+    queryKey: ['latest-works'],
+    queryFn: fetchLatestWorks,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v5)
+    select: (data) => {
+      // Transform API data to match component expectations
+      return data.map((work) => ({
+        id: work.id,
+        title: work.title,
+        client: work.client,
+        categories: work.category || [],
+        imageUrl: work.hero_banner_image,
+      }));
     },
-    {
-      id: 3,
-      title: "PROJECT_NAME",
-      client: "CLIENTS",
-      categories: ["motion graphic", "vfx", "color grading", "cgi"],
-      imageUrl: "/assets/works/work3.jpg",
-    },
-    {
-      id: 4,
-      title: "PROJECT_NAME",
-      client: "CLIENTS",
-      categories: ["motion graphic", "vfx", "color grading", "cgi"],
-      imageUrl: "/assets/works/work4.jpg",
-    },
-    {
-      id: 5,
-      title: "PROJECT_NAME",
-      client: "CLIENTS",
-      categories: ["motion graphic", "vfx", "Color grading", "cgi"],
-      imageUrl: "/assets/works/work5.jpg",
-    },
-  ];
+  });
+
+  // Use transformed data or fallback to empty arrays
+  const projects = videoBannersData || [];
+  const dataWorks = latestWorksData || [];
+
+  // Separate state for managing project positions for animations
+  const [projectPositions, setProjectPositions] = useState([]);
+
+  // Initialize project positions when video banners data loads
+  useEffect(() => {
+    if (projects.length > 0) {
+      setProjectPositions(projects.map(() => 0));
+    }
+  }, [projects.length]);
 
   // Process text to wrap each word in a span with animation styles
   const aboutText = `We are an independent post-production house trusted by our
@@ -452,46 +441,42 @@ const Home = () => {
   }, [isWindowLocked]);
 
   const handleAccrodionClick = (index) => {
-    // Clone the projects array to avoid direct state mutation
-    const tempDataProjects = [...projects];
-    let newDataProject = [];
+    // Clone the current positions
+    const newPositions = [...projectPositions];
 
     // Check if the clicked project is already open (position is negative)
-    const isPositionOpen = tempDataProjects[index].position < 0;
+    const isPositionOpen = newPositions[index] < 0;
 
     if (isPositionOpen) {
       // If project is already open, clicking closes it
-      tempDataProjects.forEach((project, i) => {
+      for (let i = 0; i < newPositions.length; i++) {
         // Last project handling
-        if (index === tempDataProjects.length - 1) {
+        if (index === newPositions.length - 1) {
           if (i === index) {
-            project.position = 0;
+            newPositions[i] = 0;
           }
-          newDataProject.push(project);
         } else {
           // For projects other than last
-          if (tempDataProjects[index + 1].position === 0) {
+          if (newPositions[index + 1] === 0) {
             if (i >= index) {
-              project.position = 0;
+              newPositions[i] = 0;
             }
-            newDataProject.push(project);
           } else {
             if (i > index) {
-              project.position = 0;
+              newPositions[i] = 0;
             }
-            newDataProject.push(project);
           }
         }
-      });
+      }
 
       // Update active project based on position
-      if (index === tempDataProjects.length - 1) {
+      if (index === newPositions.length - 1) {
         // Safety check to prevent activeProject going below 0
         const newActiveProject = Math.max(0, activeProject - 1);
         setActiveProject(newActiveProject);
         setHoveredProject(newActiveProject);
       } else {
-        if (tempDataProjects[index + 1].position === 0) {
+        if (newPositions[index + 1] === 0) {
           // Safety check to prevent activeProject going below 0
           const newActiveProject = Math.max(0, activeProject - 1);
           setActiveProject(newActiveProject);
@@ -503,13 +488,12 @@ const Home = () => {
       }
     } else {
       // If project is closed, clicking opens it
-      tempDataProjects.forEach((project, i) => {
+      for (let i = 0; i < newPositions.length; i++) {
         if (i <= index) {
           // Move all projects up to and including clicked one off screen
-          project.position = (vh - 202) * -1;
+          newPositions[i] = (vh - 202) * -1;
         }
-        newDataProject.push(project);
-      });
+      }
 
       // Set clicked project as active
       setActiveProject(index);
@@ -526,8 +510,8 @@ const Home = () => {
       setIsWindowLocked(true);
     }
 
-    // Update projects state with new positions
-    setProjects(newDataProject);
+    // Update project positions
+    setProjectPositions(newPositions);
   };
 
   console.log(scrollDirection, isWindowLocked, activeProject);
@@ -575,7 +559,19 @@ const Home = () => {
             id="projectContainer"
             className="absolute top-0 left-0 w-full h-[calc(100vh-62px)] z-[1] flex flex-col justify-end transition-all duration-700"
           >
-            {projects?.length > 0 && (
+            {isLoadingBanners ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-white text-lg">
+                  Loading video banners...
+                </div>
+              </div>
+            ) : bannersError ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-white text-lg">
+                  Error loading video banners. Please try again later.
+                </div>
+              </div>
+            ) : projects?.length > 0 ? (
               <>
                 {projects.map((project, index) => (
                   <motion.div
@@ -608,7 +604,7 @@ const Home = () => {
                             {project.client}
                           </div>
                           <div className="lg:w-full w-[80%]">
-                            {project.categories.join(", ")}
+                            {project.tags.join(", ")}
                           </div>
                         </>
                       )}
@@ -641,6 +637,7 @@ const Home = () => {
                           data-critical=""
                           style={{ objectFit: "cover" }}
                           allowFullScreen="false"
+                          poster={project.image}
                           ref={(el) => {
                             if (el) {
                               el.play().catch((error) => {
@@ -664,6 +661,12 @@ const Home = () => {
                   </motion.div>
                 ))}
               </>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-white text-lg">
+                  No video banners available
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -705,69 +708,71 @@ const Home = () => {
             </h2>
 
             <div className="mb-6">
-              <Swiper
-                slidesPerView={2.2}
-                spaceBetween={10}
-                className="w-full px-[10px]"
-                breakpoints={{
-                  320: {
-                    slidesPerView: 1.2,
-                    spaceBetween: 10,
-                  },
-                  768: {
-                    slidesPerView: 2.1,
-                    spaceBetween: 10,
-                  },
-                }}
-              >
-                {dataWorks.map((work, index) => (
-                  <SwiperSlide key={`second-row-${index}`}>
-                    <Link 
-                      to={`/works/${work.id}`} 
-                      className="workItem block"
-                    >
-                      <div className="overflow-hidden">
-                        <div className="overflow-hidden relative">
-                          <img
-                            src={work.imageUrl}
-                            alt={work.title}
-                            className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
-                          />
-                          {/* <div
-                            className="absolute top-0 left-0 w-full h-full flex flex-col items-start justify-end uppercase px-[15px] py-5"
-                            style={{
-                              background:
-                                "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%)",
-                            }}
-                          > */}
-                            {/* {work.categories
-                              .slice() // Create a copy to avoid mutating the original array
-                              .sort((a, b) => b.length - a.length) // Sort by length descending (longest first)
-                              .map((category, catIndex) => {
-                                return (
-                                  <div
-                                    key={`category-${catIndex}`}
-                                    className={`text-white leading-none`}
-                                  >
-                                    {category}
-                                  </div>
-                                );
-                              })} */}
-                          {/* </div> */}
-                        </div>
-                        <div className="mt-[10px] flex justify-between workInfo">
-                          <div className="text-black">
-                            <span className="pre">I</span>
-                            <span className="workTitle">{work.title}</span>
-                            <span className="divider">&nbsp;I&nbsp;</span>
-                            <span>{work.client}</span>
+              {isLoadingWorks ? (
+                <div className="flex items-center justify-center py-20">
+                  <div className="text-black text-lg">
+                    Loading latest projects...
+                  </div>
+                </div>
+              ) : worksError ? (
+                <div className="flex items-center justify-center py-20">
+                  <div className="text-black text-lg">
+                    Error loading latest projects. Please try again later.
+                  </div>
+                </div>
+              ) : dataWorks?.length > 0 ? (
+                <Swiper
+                  slidesPerView={2.2}
+                  spaceBetween={10}
+                  className="w-full px-[10px]"
+                  breakpoints={{
+                    320: {
+                      slidesPerView: 1.2,
+                      spaceBetween: 10,
+                    },
+                    768: {
+                      slidesPerView: 2.1,
+                      spaceBetween: 10,
+                    },
+                  }}
+                >
+                  {dataWorks.map((work, index) => {
+                    console.log(work);
+                    return (
+                      <SwiperSlide key={`second-row-${index}`}>
+                        <Link
+                          to={`/works/${work.id}`}
+                          className="workItem block"
+                        >
+                          <div className="overflow-hidden">
+                            <div className="overflow-hidden relative">
+                              <img
+                                src={work.imageUrl}
+                                alt={work.title}
+                                className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                              />
+                            </div>
+                            <div className="mt-[10px] flex justify-between workInfo">
+                              <div className="text-black">
+                                <span className="pre">I</span>
+                                <span className="workTitle">{work.title}</span>
+                                <span className="divider">&nbsp;I&nbsp;</span>
+                                <span>{work.client}</span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+                        </Link>
+                      </SwiperSlide>
+                    );
+                  })}
+                </Swiper>
+              ) : (
+                <div className="flex items-center justify-center py-20">
+                  <div className="text-black text-lg">
+                    No latest projects available.
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* View All Projects Button */}

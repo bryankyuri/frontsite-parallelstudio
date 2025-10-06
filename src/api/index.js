@@ -1,6 +1,6 @@
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
   ? import.meta.env.VITE_REACT_APP_API_URL
-  : 'http://127.0.0.1:8000/api';
+  : 'https://staging-api.parallelstudio.asia/api';
 
 export const fetchData = async (endpoint) => {
     const response = await fetch(`${API_BASE_URL}/${endpoint}`);
@@ -51,6 +51,95 @@ export const fetchWorks = async () => {
     } catch (error) {
         console.error('Error fetching works:', error);
         return [];
+    }
+};
+
+// Works API
+export const fetchLatestWorks = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/v1/works-latest`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch latest works');
+        }
+        const data = await response.json();
+        return data.success ? data.data : [];
+    } catch (error) {
+        console.error('Error fetching works:', error);
+        return [];
+    }
+};
+
+// Work Detail API - Returns both work details and related works
+export const fetchWorkDetail = async (id) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/v1/works-detail/${id}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch work detail');
+        }
+        const data = await response.json();
+        return data.success ? {
+            work: data.data,
+            relatedWorks: data.related_works || []
+        } : { work: null, relatedWorks: [] };
+    } catch (error) {
+        console.error('Error fetching work detail:', error);
+        throw error;
+    }
+};
+
+// Related Works API
+export const fetchRelatedWorks = async (id, options = {}) => {
+    try {
+        const params = new URLSearchParams();
+        if (options.limit) params.append('limit', options.limit);
+        if (options.sort_by) params.append('sort_by', options.sort_by);
+        if (options.sort_direction) params.append('sort_direction', options.sort_direction);
+        
+        const queryString = params.toString();
+        const url = `${API_BASE_URL}/v1/works-related/${id}${queryString ? `?${queryString}` : ''}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Failed to fetch related works');
+        }
+        const data = await response.json();
+        return data.success ? data.data : [];
+    } catch (error) {
+        console.error('Error fetching related works:', error);
+        return [];
+    }
+};
+
+// Works List API with filtering and pagination
+export const fetchWorksList = async (filters = {}) => {
+    try {
+        const params = new URLSearchParams();
+        
+        // Add filters to query params
+        if (filters.search) params.append('search', filters.search);
+        if (filters.category) params.append('category', filters.category);
+        if (filters.tags && filters.tags.length > 0) {
+            filters.tags.forEach(tag => params.append('tags[]', tag));
+        }
+        if (filters.year) params.append('year', filters.year);
+        if (filters.client) params.append('client', filters.client);
+        if (filters.sort_by) params.append('sort_by', filters.sort_by);
+        if (filters.sort_direction) params.append('sort_direction', filters.sort_direction);
+        if (filters.page) params.append('page', filters.page);
+        if (filters.per_page) params.append('per_page', filters.per_page);
+        
+        const queryString = params.toString();
+        const url = `${API_BASE_URL}/v1/works-list${queryString ? `?${queryString}` : ''}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Failed to fetch works list');
+        }
+        const data = await response.json();
+        return data.success ? data : { data: [], meta: {}, filters: {}, applied_filters: {} };
+    } catch (error) {
+        console.error('Error fetching works list:', error);
+        return { data: [], meta: {}, filters: {}, applied_filters: {} };
     }
 };
 

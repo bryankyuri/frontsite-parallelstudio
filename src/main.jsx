@@ -1,7 +1,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { AppProvider } from "./context/AppContext";
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import App from './App';
 import './styles/global.scss';
 import NProgress from 'nprogress';
@@ -20,26 +21,12 @@ NProgress.configure({
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      onLoading: () => {
-        NProgress.start();
-      },
-      onSuccess: () => {
-        NProgress.done();
-      },
-      onError: () => {
-        NProgress.done();
-      },
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v5)
     },
     mutations: {
-      onLoading: () => {
-        NProgress.start();
-      },
-      onSuccess: () => {
-        NProgress.done();
-      },
-      onError: () => {
-        NProgress.done();
-      },
+      retry: 1,
     },
   },
 });
@@ -53,6 +40,13 @@ root.render(
   <AppProvider>
     <QueryClientProvider client={queryClient}>
       <App />
+      {/* Only show React Query DevTools in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <ReactQueryDevtools 
+          initialIsOpen={false}
+          buttonPosition="bottom-right"
+        />
+      )}
     </QueryClientProvider>
   </AppProvider>
 );

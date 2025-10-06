@@ -3,9 +3,13 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './routes';
 import { registerSW } from 'virtual:pwa-register';
 import googleAnalytics from './services/googleAnalytics';
+import { useNProgressIntegration } from './hooks/useNProgressIntegration';
 import './styles/global.scss';
 
 function App() {
+  // Initialize NProgress integration with React Query
+  useNProgressIntegration();
+
   useEffect(() => {
     // Initialize PWA service worker
     const updateSW = registerSW({
