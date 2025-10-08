@@ -358,7 +358,7 @@ const About = () => {
           </div>
         </section>
       </FadeInSection>
-      <section className="services pb-20" id="our-services">
+      {/* <section className="services pb-20" id="our-services">
         <div className="w-full ">
           <div className="">
             {job.map((jobItem) => (
@@ -432,7 +432,7 @@ const About = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       <FadeInSection delay={0.3}>
         <div className="px-[10px] w-full mb-[155px]">

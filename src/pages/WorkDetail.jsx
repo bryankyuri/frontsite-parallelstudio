@@ -689,7 +689,7 @@ const WorkDetail = () => {
                 {relatedWorksData.map((workItem, index) => (
                   <SwiperSlide key={`second-row-${index}`}>
                     <Link
-                      to={`/works/${workItem.id}`}
+                      to={`/works/${workItem.id}/${workItem.slug}`}
                       className="workItem block"
                     >
                       <div className="overflow-hidden">

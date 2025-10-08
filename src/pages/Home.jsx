@@ -23,39 +23,40 @@ import { FadeInSection } from "../components/FadeInSection";
 import { video } from "framer-motion/client";
 import { debounce } from "lodash";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Stream } from '@cloudflare/stream-react';
+import { Stream } from "@cloudflare/stream-react";
 import { useGoogleAnalytics } from "../hooks/useGoogleAnalytics";
 import "swiper/css";
 
 const Home = () => {
-  const { vh, deviceType } = useContext(AppContext);
+  const { vh, deviceType, isMobile } = useContext(AppContext);
 
   // Helper function to extract video ID from Cloudflare Stream URL
   const getCloudflareVideoId = (url) => {
-    if (!url) return '';
-    
+    if (!url) return "";
+
     // Handle different Cloudflare Stream URL formats
     // Format 1: https://customer-domain.cloudflarestream.com/videoId/manifest/video.m3u8
     // Format 2: https://customer-domain.cloudflarestream.com/videoId
     // Format 3: https://iframe.videodelivery.net/videoId
-    
+
     try {
       // Remove query parameters first
-      const cleanUrl = url.split('?')[0];
-      
+      const cleanUrl = url.split("?")[0];
+
       // Extract video ID from different URL patterns
-      if (cleanUrl.includes('iframe.videodelivery.net')) {
-        return cleanUrl.split('/').pop();
-      } else if (cleanUrl.includes('cloudflarestream.com')) {
-        const parts = cleanUrl.split('/');
-        const videoIdIndex = parts.findIndex(part => part.includes('cloudflarestream.com')) + 1;
-        return parts[videoIdIndex] || cleanUrl.split('/').pop();
+      if (cleanUrl.includes("iframe.videodelivery.net")) {
+        return cleanUrl.split("/").pop();
+      } else if (cleanUrl.includes("cloudflarestream.com")) {
+        const parts = cleanUrl.split("/");
+        const videoIdIndex =
+          parts.findIndex((part) => part.includes("cloudflarestream.com")) + 1;
+        return parts[videoIdIndex] || cleanUrl.split("/").pop();
       } else {
         // Fallback: assume the last part is the video ID
-        return cleanUrl.split('/').pop();
+        return cleanUrl.split("/").pop();
       }
     } catch (error) {
-      console.error('Error extracting Cloudflare video ID:', error);
+      console.error("Error extracting Cloudflare video ID:", error);
       return url;
     }
   };
@@ -79,7 +80,7 @@ const Home = () => {
     isLoading: isLoadingBanners,
     error: bannersError,
   } = useQuery({
-    queryKey: ['video-banners'],
+    queryKey: ["video-banners"],
     queryFn: fetchVideoBanners,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v5)
@@ -90,9 +91,10 @@ const Home = () => {
         image: banner.video_thumbnail || `/assets/works/work${index + 1}.jpg`,
         title: banner.title,
         client: banner.client,
+        slug: banner.slug, // Add slug mapping
         tags: banner.categories || [],
         videoUrl: banner.video_url,
-        videoSourceType: banner.video_source_type || 'default', // Add video source type
+        videoSourceType: banner.video_source_type || "default", // Add video source type
         position: 0,
       }));
     },
@@ -104,7 +106,7 @@ const Home = () => {
     isLoading: isLoadingWorks,
     error: worksError,
   } = useQuery({
-    queryKey: ['latest-works'],
+    queryKey: ["latest-works"],
     queryFn: fetchLatestWorks,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v5)
@@ -114,6 +116,7 @@ const Home = () => {
         id: work.id,
         title: work.title,
         client: work.client,
+        slug: work.slug, // Add slug mapping
         categories: work.category || [],
         imageUrl: work.hero_banner_image,
       }));
@@ -153,7 +156,7 @@ const Home = () => {
   const [touchStartY, setTouchStartY] = useState(0);
   const [touchThreshold, setTouchThreshold] = useState(50); // Sensitivity threshold
 
-  // Add custom cursor styles
+  // Add custom cursor styles with simple stream scaling
   const customCursorStyles = `
     @keyframes marquee {
       0% { transform: translateX(0); }
@@ -163,6 +166,58 @@ const Home = () => {
     .animate-marquee {
       display: inline-block;
       animation: marquee 5s linear infinite;
+    }
+    
+    /* Regular video container */
+    .video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .video-container video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    /* Mobile: 9:16 ratio - scale video to cover */
+    @media (max-width: 1269px) {
+      .video-container video {
+        width: 177.78%;
+        height: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+    
+    /* Simple Stream container */
+    .stream-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+    
+    /* Ensure Stream component fills container */
+    .stream-container > * {
+      width: 100% !important;
+      height: 100% !important;
     }
   `;
 
@@ -649,7 +704,7 @@ const Home = () => {
                       </div>
                     </button>
                     <Link
-                      to={`/works/${project.id}`}
+                      to={`/works/${project.id}/${project.slug}`}
                       className="top-[35px] absolute z-0 w-full outline-none"
                       style={{ height: "calc(100vh - 202px)" }}
                     >
@@ -659,57 +714,63 @@ const Home = () => {
                         onMouseEnter={() => setHoveredProject(index)}
                         onMouseLeave={() => setHoveredProject(null)}
                       >
-                        {project.videoSourceType === 'cloudflare' ? (
-                          <Stream
-                            src={getCloudflareVideoId(project.videoUrl)}
-                            loop
-                            muted
-                            autoplay
-                            preload="auto"
-                            poster={project.image}
-                            className="absolute w-full h-full top-0 left-0 outline-none"
-                            style={{ objectFit: "cover" }}
-                            controls={false}
-                            onLoadStart={() => {
-                              console.log("Cloudflare stream loading started");
+                        {project.videoSourceType === "cloudflare" ? (
+                          <div 
+                            className="stream-container"
+                            style={{
+                              transform: isMobile ? "scale(3)" : "scale(1)"
                             }}
-                            onError={(error) => {
-                              console.log("Cloudflare stream error:", error);
-                            }}
-                            onPlay={() => {
-                              console.log("Cloudflare stream playing");
-                            }}
-                          />
+                          >
+                            <Stream
+                              src={getCloudflareVideoId(project.videoUrl)}
+                              controls={false}
+                              autoplay={true}
+                              loop={true}
+                              muted={true}
+                              poster={project.image}
+                              style={{
+                                pointerEvents: "none",
+                                width: "100%",
+                                height: "100%"
+                              }}
+                            />
+                            {/* Invisible overlay to ensure event handling works */}
+                            <div
+                              className="absolute top-0 left-0 w-full h-full z-10"
+                              style={{ pointerEvents: "auto", background: "transparent" }}
+                            />
+                          </div>
                         ) : (
-                          <video
-                            src={project.videoUrl}
-                            loop
-                            muted
-                            playsInline
-                            autoPlay
-                            className="absolute w-full h-full top-0 left-0 outline-none"
-                            data-critical=""
-                            style={{ objectFit: "cover" }}
-                            allowFullScreen="false"
-                            poster={project.image}
-                            ref={(el) => {
-                              if (el) {
-                                el.play().catch((error) => {
-                                  console.log("Autoplay prevented:", error);
-                                  // Attempt to play again on first user interaction
-                                  document.body.addEventListener(
-                                    "touchstart",
-                                    () => {
-                                      el.play().catch((e) =>
-                                        console.log("Still can't play:", e)
-                                      );
-                                    },
-                                    { once: true }
-                                  );
-                                });
-                              }
-                            }}
-                          />
+                          <div className="video-container">
+                            <video
+                              src={project.videoUrl}
+                              loop
+                              muted
+                              playsInline
+                              autoPlay
+                              className="outline-none"
+                              data-critical=""
+                              allowFullScreen="false"
+                              poster={project.image}
+                              ref={(el) => {
+                                if (el) {
+                                  el.play().catch((error) => {
+                                    console.log("Autoplay prevented:", error);
+                                    // Attempt to play again on first user interaction
+                                    document.body.addEventListener(
+                                      "touchstart",
+                                      () => {
+                                        el.play().catch((e) =>
+                                          console.log("Still can't play:", e)
+                                        );
+                                      },
+                                      { once: true }
+                                    );
+                                  });
+                                }
+                              }}
+                            />
+                          </div>
                         )}
                       </div>
                     </Link>
@@ -800,7 +861,10 @@ const Home = () => {
                           className="workItem block"
                         >
                           <div className="overflow-hidden">
-                            <div className="overflow-hidden relative bg-black aspect-[16/9]" id={`workImage${index}`}>
+                            <div
+                              className="overflow-hidden relative bg-black aspect-[16/9]"
+                              id={`workImage${index}`}
+                            >
                               <img
                                 src={work.imageUrl}
                                 alt={work.title}
