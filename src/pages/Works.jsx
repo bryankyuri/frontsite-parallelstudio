@@ -140,7 +140,7 @@ const Works = () => {
 
         <FadeInSection delay={0.1} id="type-categories-filters">
           {deviceType === "desktop" ? (
-            <div className="flex justify-center mt-[117px] mb-8 space-x-4 ">
+            <div className="flex justify-center mt-[117px] space-x-4 ">
               {typeCategory.map((category, index) => (
                 <button
                   key={index}
@@ -175,13 +175,13 @@ const Works = () => {
         </FadeInSection>
 
         <FadeInSection delay={0.1} id="type-categories-filters">
-          <div className="flex justify-center lg:mb-[151px] mb-[117px] space-x-4">
+          <div className="flex justify-center lg:mb-[151px] mb-[117px] space-x-2">
             {deviceType === "desktop" ? (
               <>
                 {typeTags.map((tag, index) => (
                   <button
                     key={index}
-                    className={`px-4 py-2 rounded transition-all duration-200 ${
+                    className={`px-2 pt-[4px] pb-[3px] rounded-[6px] transition-all duration-200 text-[12px] ${
                       activeFilters.includes(tag)
                         ? "bg-black text-white"
                         : "bg-[#F0F0F0] text-[#787878] hover:bg-gray-300"
@@ -250,13 +250,13 @@ const Works = () => {
                       transition={{ duration: 0.4 }}
                       className="w-full"
                     >
-                      <Link to={`/works/${work.id}`} className="workItem">
+                      <Link to={`/works/${work.id}/${work.slug}`} className="workItem">
                         <div className="overflow-hidden">
-                          <div className="overflow-hidden relative">
+                          <div className="overflow-hidden relative bg-black aspect-[16/9]" id={`workItem${index}`}>
                             <img
                               src={work.hero_banner_image}
                               alt={work.title}
-                              className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                              className="w-full h-full object-cover transition-transform duration-700 hover:scale-[107%]"
                             />
                           </div>
                           <div className="mt-[10px] flex justify-between workInfo">

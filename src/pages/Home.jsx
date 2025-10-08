@@ -23,11 +23,42 @@ import { FadeInSection } from "../components/FadeInSection";
 import { video } from "framer-motion/client";
 import { debounce } from "lodash";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Stream } from '@cloudflare/stream-react';
 import { useGoogleAnalytics } from "../hooks/useGoogleAnalytics";
 import "swiper/css";
 
 const Home = () => {
   const { vh, deviceType } = useContext(AppContext);
+
+  // Helper function to extract video ID from Cloudflare Stream URL
+  const getCloudflareVideoId = (url) => {
+    if (!url) return '';
+    
+    // Handle different Cloudflare Stream URL formats
+    // Format 1: https://customer-domain.cloudflarestream.com/videoId/manifest/video.m3u8
+    // Format 2: https://customer-domain.cloudflarestream.com/videoId
+    // Format 3: https://iframe.videodelivery.net/videoId
+    
+    try {
+      // Remove query parameters first
+      const cleanUrl = url.split('?')[0];
+      
+      // Extract video ID from different URL patterns
+      if (cleanUrl.includes('iframe.videodelivery.net')) {
+        return cleanUrl.split('/').pop();
+      } else if (cleanUrl.includes('cloudflarestream.com')) {
+        const parts = cleanUrl.split('/');
+        const videoIdIndex = parts.findIndex(part => part.includes('cloudflarestream.com')) + 1;
+        return parts[videoIdIndex] || cleanUrl.split('/').pop();
+      } else {
+        // Fallback: assume the last part is the video ID
+        return cleanUrl.split('/').pop();
+      }
+    } catch (error) {
+      console.error('Error extracting Cloudflare video ID:', error);
+      return url;
+    }
+  };
 
   // Initialize basic Google Analytics page tracking
   useGoogleAnalytics();
@@ -61,6 +92,7 @@ const Home = () => {
         client: banner.client,
         tags: banner.categories || [],
         videoUrl: banner.video_url,
+        videoSourceType: banner.video_source_type || 'default', // Add video source type
         position: 0,
       }));
     },
@@ -627,35 +659,58 @@ const Home = () => {
                         onMouseEnter={() => setHoveredProject(index)}
                         onMouseLeave={() => setHoveredProject(null)}
                       >
-                        <video
-                          src={project.videoUrl}
-                          loop
-                          muted
-                          playsInline
-                          autoPlay
-                          className="absolute w-full h-full top-0 left-0 outline-none"
-                          data-critical=""
-                          style={{ objectFit: "cover" }}
-                          allowFullScreen="false"
-                          poster={project.image}
-                          ref={(el) => {
-                            if (el) {
-                              el.play().catch((error) => {
-                                console.log("Autoplay prevented:", error);
-                                // Attempt to play again on first user interaction
-                                document.body.addEventListener(
-                                  "touchstart",
-                                  () => {
-                                    el.play().catch((e) =>
-                                      console.log("Still can't play:", e)
-                                    );
-                                  },
-                                  { once: true }
-                                );
-                              });
-                            }
-                          }}
-                        ></video>
+                        {project.videoSourceType === 'cloudflare' ? (
+                          <Stream
+                            src={getCloudflareVideoId(project.videoUrl)}
+                            loop
+                            muted
+                            autoplay
+                            preload="auto"
+                            poster={project.image}
+                            className="absolute w-full h-full top-0 left-0 outline-none"
+                            style={{ objectFit: "cover" }}
+                            controls={false}
+                            onLoadStart={() => {
+                              console.log("Cloudflare stream loading started");
+                            }}
+                            onError={(error) => {
+                              console.log("Cloudflare stream error:", error);
+                            }}
+                            onPlay={() => {
+                              console.log("Cloudflare stream playing");
+                            }}
+                          />
+                        ) : (
+                          <video
+                            src={project.videoUrl}
+                            loop
+                            muted
+                            playsInline
+                            autoPlay
+                            className="absolute w-full h-full top-0 left-0 outline-none"
+                            data-critical=""
+                            style={{ objectFit: "cover" }}
+                            allowFullScreen="false"
+                            poster={project.image}
+                            ref={(el) => {
+                              if (el) {
+                                el.play().catch((error) => {
+                                  console.log("Autoplay prevented:", error);
+                                  // Attempt to play again on first user interaction
+                                  document.body.addEventListener(
+                                    "touchstart",
+                                    () => {
+                                      el.play().catch((e) =>
+                                        console.log("Still can't play:", e)
+                                      );
+                                    },
+                                    { once: true }
+                                  );
+                                });
+                              }
+                            }}
+                          />
+                        )}
                       </div>
                     </Link>
                   </motion.div>
@@ -741,15 +796,15 @@ const Home = () => {
                     return (
                       <SwiperSlide key={`second-row-${index}`}>
                         <Link
-                          to={`/works/${work.id}`}
+                          to={`/works/${work.id}/${work.slug}`}
                           className="workItem block"
                         >
                           <div className="overflow-hidden">
-                            <div className="overflow-hidden relative">
+                            <div className="overflow-hidden relative bg-black aspect-[16/9]" id={`workImage${index}`}>
                               <img
                                 src={work.imageUrl}
                                 alt={work.title}
-                                className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                                className="w-full h-full object-cover transition-transform duration-700 hover:scale-[107%]"
                               />
                             </div>
                             <div className="mt-[10px] flex justify-between workInfo">

@@ -38,7 +38,7 @@ export const router = createBrowserRouter([
         loader: () => null
       },
       {
-        path: 'works/:workId',
+        path: 'works/:workId/:slug',
         element: <WorkDetail />,
         loader: ({ params }) => params || null
       },

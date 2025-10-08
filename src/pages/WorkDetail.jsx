@@ -23,6 +23,7 @@ const WorkDetail = () => {
   // Add these state variables at the top of your component
   const [popupImage, setPopupImage] = useState(null);
   const [popupImageIndex, setPopupImageIndex] = useState(0);
+  const [activeVideoTab, setActiveVideoTab] = useState("uploaded");
 
   // Fetch work detail using TanStack Query (includes related works)
   const {
@@ -84,6 +85,21 @@ const WorkDetail = () => {
       }
     };
   }, []);
+
+  // Auto-select first available video tab
+  useEffect(() => {
+    if (work) {
+      if (work.video_project_src) {
+        setActiveVideoTab("uploaded");
+      } else if (work.video_vimeo_url) {
+        setActiveVideoTab("vimeo");
+      } else if (work.video_youtube_url) {
+        setActiveVideoTab("youtube");
+      } else if (work.video_cloudflare_url) {
+        setActiveVideoTab("cloudflare");
+      }
+    }
+  }, [work]);
 
   // Add this function to handle image clicks
   const handleImageClick = (imageUrl, index = 0) => {
@@ -476,9 +492,66 @@ const WorkDetail = () => {
           </div>
         </div>
         <FadeInSection delay={0.3}>
-          <div id="ShowReel" className="lg:mb-[10px] mb-[10px]">
+          {/* Video Player Tabs */}
+          {(work.video_project_src ? 1 : 0) +
+            (work.video_vimeo_url ? 1 : 0) +
+            (work.video_youtube_url ? 1 : 0) +
+            (work.video_cloudflare_url ? 1 : 0) >
+            1 && (
+            <div className="flex w-full bg-black">
+              {work.video_project_src && (
+                <button
+                  onClick={() => setActiveVideoTab("uploaded")}
+                  className={`px-3 py-1 text-xs font-medium ${
+                    activeVideoTab === "uploaded"
+                      ? "bg-white text-black"
+                      : "text-white hover:bg-white hover:bg-opacity-20"
+                  }`}
+                >
+                  Optimized (Low Bit Rate)
+                </button>
+              )}
+              {work.video_vimeo_url && (
+                <button
+                  onClick={() => setActiveVideoTab("vimeo")}
+                  className={`px-3 py-1 text-xs font-medium ${
+                    activeVideoTab === "vimeo"
+                      ? "bg-white text-black"
+                      : "text-white hover:bg-white hover:bg-opacity-20"
+                  }`}
+                >
+                  Vimeo
+                </button>
+              )}
+              {work.video_youtube_url && (
+                <button
+                  onClick={() => setActiveVideoTab("youtube")}
+                  className={`px-3 py-1 text-xs font-medium ${
+                    activeVideoTab === "youtube"
+                      ? "bg-white text-black"
+                      : "text-white hover:bg-white hover:bg-opacity-20"
+                  }`}
+                >
+                  YouTube
+                </button>
+              )}
+              {work.video_cloudflare_url && (
+                <button
+                  onClick={() => setActiveVideoTab("cloudflare")}
+                  className={`px-3 py-1 text-xs font-medium ${
+                    activeVideoTab === "cloudflare"
+                      ? "bg-white text-black"
+                      : "text-white hover:bg-white hover:bg-opacity-20"
+                  }`}
+                >
+                  Cloudflare
+                </button>
+              )}
+            </div>
+          )}
+          <div id="Video-Project-Player" className="lg:mb-[10px] mb-[10px]">
             <div
-              className="relative w-full"
+              className="relative w-full bg-black"
               style={{
                 paddingBottom:
                   deviceType === "desktop"
@@ -486,39 +559,86 @@ const WorkDetail = () => {
                     : "calc(86.25% - 62px)",
               }}
             >
-              <video
-                className="absolute top-0 left-0 w-full h-full object-cover"
-                src={
-                  work.video_project_src ||
-                  "https://videos.virtual-app.my.id/tokpedia_ramadhan.mp4"
-                }
-                poster={work.video_project_poster}
-                controls
-                controlsList="nodownload noplaybackrate"
-                playsInline
-                preload="metadata"
-                style={{ borderRadius: "0px" }}
-                onError={(e) => {
-                  console.log("Showreel video failed to load:", e);
-                }}
-                onLoadedData={() => {
-                  console.log("Showreel video loaded successfully");
-                }}
-                onPlay={(e) => {
-                  // Auto fullscreen when video starts playing
-                  if (e.target.requestFullscreen) {
-                    e.target.requestFullscreen().catch((err) => {
-                      console.log("Fullscreen request failed:", err);
-                    });
-                  } else if (e.target.webkitRequestFullscreen) {
-                    e.target.webkitRequestFullscreen();
-                  } else if (e.target.msRequestFullscreen) {
-                    e.target.msRequestFullscreen();
-                  }
-                }}
-              >
-                Your browser does not support the video tag.
-              </video>
+              {/* Video Player Content */}
+              {activeVideoTab === "uploaded" && work.video_project_src ? (
+                <video
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                  src={work.video_project_src}
+                  poster={work.video_project_poster}
+                  controls
+                  controlsList="nodownload noplaybackrate"
+                  playsInline
+                  preload="metadata"
+                  style={{ borderRadius: "0px" }}
+                  onError={(e) => {
+                    console.log("Video Project video failed to load:", e);
+                  }}
+                  onLoadedData={() => {
+                    console.log("Video Project video loaded successfully");
+                  }}
+                  onPlay={(e) => {
+                    // Auto fullscreen when video starts playing
+                    if (e.target.requestFullscreen) {
+                      e.target.requestFullscreen().catch((err) => {
+                        console.log("Fullscreen request failed:", err);
+                      });
+                    } else if (e.target.webkitRequestFullscreen) {
+                      e.target.webkitRequestFullscreen();
+                    } else if (e.target.msRequestFullscreen) {
+                      e.target.msRequestFullscreen();
+                    }
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : activeVideoTab === "vimeo" && work.video_vimeo_url ? (
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full"
+                  src={work.video_vimeo_url}
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture; accelerometer; encrypted-media; gyroscope"
+                  allowFullScreen
+                  title="Vimeo Video"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                  }}
+                />
+              ) : activeVideoTab === "youtube" && work.video_youtube_url ? (
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full"
+                  src={work.video_youtube_url}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="YouTube Video"
+                  style={{ width: "100%", height: "100%", border: "none" }}
+                />
+              ) : activeVideoTab === "cloudflare" &&
+                work.video_cloudflare_url ? (
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full"
+                  src={work.video_cloudflare_url}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Cloudflare Stream Video"
+                  style={{ width: "100%", height: "100%", border: "none" }}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-black text-white">
+                  <div className="text-center">
+                    <div className="text-lg mb-2">No video available</div>
+                    <div className="text-sm opacity-70">
+                      This work doesn't have a video project attached
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </FadeInSection>
@@ -573,11 +693,11 @@ const WorkDetail = () => {
                       className="workItem block"
                     >
                       <div className="overflow-hidden">
-                        <div className="overflow-hidden relative">
+                        <div className="overflow-hidden relative bg-black aspect-video" id={`workImage${index}`}>
                           <img
                             src={workItem.hero_banner_image}
                             alt={workItem.title}
-                            className="w-full object-cover transition-transform duration-700 hover:scale-[107%]"
+                            className="w-full h-full object-cover transition-transform duration-700 hover:scale-[107%]"
                           />
                         </div>
                         <div className="mt-[10px] flex justify-between workInfo">

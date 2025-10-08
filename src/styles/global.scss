@@ -242,3 +242,14 @@ button {
   overflow: hidden;
   transition: opacity 0.3s ease, width 0.3s ease;
 }
+
+
+iframe[dataplayer="cloudflare"] {
+  aspect-ratio: unset !important;
+}
+
+iframe[dataplayer="cloudflare"] stream video {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+}
