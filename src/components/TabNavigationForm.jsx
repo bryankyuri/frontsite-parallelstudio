@@ -6,8 +6,8 @@ const TabNavigationForm = ({
 }) => {
   const tabs = [
     { id: 'pitch', label: 'PITCH.' },
-    { id: 'partner', label: 'PARTNER.' },
-    { id: 'produce', label: 'PRODUCE.' }
+    { id: 'produce', label: 'PRODUCE.' },
+    { id: 'career', label: 'CAREERS' }
   ];
 
   return (

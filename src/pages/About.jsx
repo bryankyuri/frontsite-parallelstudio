@@ -329,9 +329,9 @@ const About = () => {
         <section className="services py-20" id="send-portofolio">
           <div className="w-full px-[10px] flex flex-col lg:flex-row lg:items-start lg:justify-between">
             <div className="lg:w-[80%] w-full">
-              <button className="w-[246px] h-[51px] flex justify-center items-center border bg-black border-black  text-white hover:bg-white hover:border-black  hover:text-black font-semibold rounded mb-10 transition-all duration-[0.3s]">
+              <Link to="/contact?form=career" className="w-[246px] h-[51px] flex justify-center items-center border bg-black border-black  text-white hover:bg-white hover:border-black  hover:text-black font-semibold rounded mb-10 transition-all duration-[0.3s]">
                 SEND US YOUR PORTFOLIO
-              </button>
+              </Link>
             </div>
             <div className="w-full text-left">
               <div className="font-bold leading-[120%] text-[24px] lg:text-[32px] text-black uppercase">

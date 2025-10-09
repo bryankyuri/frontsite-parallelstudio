@@ -48,7 +48,7 @@ const Contact = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const formParam = urlParams.get("form");
 
-    if (formParam && ["pitch", "partner", "produce"].includes(formParam)) {
+    if (formParam && ["pitch", "partner", "produce", "career"].includes(formParam)) {
       setIsShowForm(formParam);
     }
   }, []);
@@ -418,7 +418,7 @@ const Contact = () => {
                 className="lg:w-[920px] w-[calc(100vw-20px)] mx-auto lg:p-[40px] px-[10px] py-[20px]  bg-white text-black animate-slideUp"
                 id="form-container"
               >
-                {isShowForm === "pitch" && (
+                {isShowForm === "career" && (
                   <div className="w-full mx-auto animate-fadeIn">
                     {/* Header */}
                     <div className="text-center mb-8">
@@ -537,7 +537,11 @@ const Contact = () => {
                             pitchErrors.message
                               ? "border-red-500 focus:border-red-500"
                               : "border-gray-300 focus:border-black"
-                          } ${pitchForm.message.length > 0 ? "h-[278px]" : "pt-[120px] h-auto text-center"}`}
+                          } ${
+                            pitchForm.message.length > 0
+                              ? "h-[278px]"
+                              : "pt-[120px] h-auto text-center"
+                          }`}
                         />
                         {pitchErrors.message && (
                           <div className="text-red-500 text-xs mt-1 text-center">
@@ -560,7 +564,7 @@ const Contact = () => {
                   </div>
                 )}
 
-                {isShowForm === "partner" && (
+                {isShowForm === "pitch" && (
                   <div className="w-full mx-auto animate-fadeIn">
                     {/* Header */}
                     <div className="text-center mb-8">
@@ -569,8 +573,9 @@ const Contact = () => {
                       </h3>
 
                       <div className="relative mb-12 mx-auto text-[#969696]">
-                        Let’s build stories together. For brands, agencies, and
-                        creatives ready to collaborate.
+                        Have a short film idea with a strong voice? Let’s
+                        collaborate. We’re open to collaboration and
+                        post-production support for unique, impactful projects.
                       </div>
                     </div>
 
@@ -664,7 +669,11 @@ const Contact = () => {
                             partnerErrors.message
                               ? "border-red-500 focus:border-red-500"
                               : "border-gray-300 focus:border-black"
-                          } ${partnerForm.message.length > 0 ? "h-[278px]" : "pt-[120px] h-auto text-center"}`}
+                          } ${
+                            partnerForm.message.length > 0
+                              ? "h-[278px]"
+                              : "pt-[120px] h-auto text-center"
+                          }`}
                         />
                         {partnerErrors.message && (
                           <div className="text-red-500 text-xs mt-1 text-center">
@@ -696,8 +705,9 @@ const Contact = () => {
                       </h3>
 
                       <div className="relative mb-12 mx-auto text-[#969696]">
-                        We make your vision cinematic. For clients looking to
-                        bring their project to life with our team.
+                        For brands, agencies, or production houses looking for
+                        post-production partners—let’s make something remarkable
+                        together.
                       </div>
                     </div>
 
@@ -787,7 +797,11 @@ const Contact = () => {
                             produceErrors.message
                               ? "border-red-500 focus:border-red-500"
                               : "border-gray-300 focus:border-black"
-                          } ${produceForm.message.length > 0 ? "h-[278px]" : "pt-[120px] h-auto text-center"}`}
+                          } ${
+                            produceForm.message.length > 0
+                              ? "h-[278px]"
+                              : "pt-[120px] h-auto text-center"
+                          }`}
                         />
                         {produceErrors.message && (
                           <div className="text-red-500 text-xs mt-1 text-center">
@@ -818,22 +832,22 @@ const Contact = () => {
                 id="navigation-form"
               >
                 <NavigationFormItem
-                  title="PITCH."
-                  description="Show us what you've got. For filmmakers, editors, and that we're looking to join this crew."
-                  buttonText="SEND US YOUR PORTFOLIO"
+                  title="PITCH"
+                  description="Have a short film idea with a strong voice? Let’s collaborate. We’re open to collaboration and post-production support for unique, impactful projects."
+                  buttonText="CO-CREATE WITH US"
                   onClick={() => setIsShowForm("pitch")}
                 />
                 <NavigationFormItem
-                  title="PARTNER."
-                  description="Let's build stories together. For brands, agencies, and creatives ready to collaborate."
-                  buttonText="CO-CREATE WITH US"
-                  onClick={() => setIsShowForm("partner")}
-                />
-                <NavigationFormItem
-                  title="PRODUCE."
-                  description="We make your vision cinematic. For clients looking to bring their project to life with our team."
+                  title="PRODUCE"
+                  description="For brands, agencies, or production houses looking for post-production partners—let’s make something remarkable together."
                   buttonText="BOOK THE TEAM"
                   onClick={() => setIsShowForm("produce")}
+                />
+                <NavigationFormItem
+                  title="CAREERS"
+                  description="If you’re a colorist, editor, VFX artist, or post-production specialist looking to work on exciting projects, we’d love to connect."
+                  buttonText="SEND US YOUR PORTFOLIO"
+                  onClick={() => setIsShowForm("career")}
                 />
               </div>
             </FadeInSection>
