@@ -143,11 +143,134 @@ const WorkDetail = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [popupImage, popupImageIndex]);
 
+  // Helper function to get aspect ratio class
+  const getAspectRatioStyle = (type) => {
+    // Extract aspect ratio from type (e.g., "full-16:9" -> "16:9")
+    if (type.includes('16:9')) {
+      return { paddingBottom: '56.25%' }; // 16:9 aspect ratio
+    } else if (type.includes('2.35:1')) {
+      return { paddingBottom: '42.55%' }; // 2.35:1 CinemaScope aspect ratio
+    } else if (type.includes('2.39:1')) {
+      return { paddingBottom: '41.84%' }; // 2.39:1 Panavision aspect ratio
+    } else if (type.includes('4:5')) {
+      return { paddingBottom: '125%' }; // 4:5 portrait aspect ratio
+    }
+    return null; // Auto height for non-ratio types
+  };
+
   // Update your renderImage function
   const renderImage = (type, imageUrl) => {
     // Add safety check for imageUrl
     if (!imageUrl) return null;
 
+    const aspectRatioStyle = getAspectRatioStyle(type);
+
+    // Full Width Images (16:9, 2.35:1, 2.39:1)
+    if (type.startsWith('full-')) {
+      return (
+        <div className="w-full relative overflow-hidden bg-black" style={aspectRatioStyle}>
+          <img
+            src={imageUrl}
+            alt={work?.title || "Work image"}
+            className="absolute inset-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => handleImageClick(imageUrl)}
+          />
+        </div>
+      );
+    }
+
+    // Two Column Images (16:9, 2.35:1, 2.39:1)
+    if (type.startsWith('2col-')) {
+      if (!Array.isArray(imageUrl) || imageUrl.length === 0) return null;
+      return (
+        <div className="grid grid-cols-2 gap-[10px]">
+          {imageUrl.map((url, index) => (
+            <div key={index} className="relative overflow-hidden bg-black" style={aspectRatioStyle}>
+              <img
+                src={url}
+                alt={work?.title || "Work image"}
+                className="absolute inset-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => handleImageClick(imageUrl, index)}
+              />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Before/After Comparison Images (16:9, 2.35:1, 2.39:1)
+    if (type.startsWith('compare-')) {
+      if (!Array.isArray(imageUrl) || imageUrl.length < 2) return null;
+      return (
+        <div className="w-full relative">
+          {/* Create a proper sticky container with background */}
+          <div className="sticky top-[62px] z-20 w-full bg-opacity-10 pt-4 px-[10px]">
+            <div className="flex justify-between items-center">
+              {sliderPosition !== 0 && (
+                <button
+                  onClick={() => !isAnimating && animateSlider(100)}
+                  className="bg-black bg-opacity-70 text-white lg:px-3 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300"
+                  disabled={isAnimating}
+                >
+                  BEFORE
+                </button>
+              )}
+
+              {sliderPosition < 99 && (
+                <button
+                  onClick={() => !isAnimating && animateSlider(0)}
+                  className="bg-black bg-opacity-70 text-white lg:px-3 px-2 py-1 lg:text-sm text-xs font-medium rounded transition-opacity duration-300 ml-auto"
+                  disabled={isAnimating}
+                >
+                  AFTER
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* The compare slider below the sticky header */}
+          <div className="mt-[-40px]">
+            <div
+              className="cursor-pointer hover:opacity-90 transition-opacity relative overflow-hidden bg-black"
+              style={aspectRatioStyle}
+              onClick={() => handleImageClick(imageUrl)}
+            >
+              <div className="absolute inset-0">
+                <ReactCompareSlider
+                  itemOne={
+                    <ReactCompareSliderImage
+                      src={imageUrl[0]}
+                      alt="Before"
+                      className="w-full h-full object-cover"
+                    />
+                  }
+                  itemTwo={
+                    <ReactCompareSliderImage
+                      src={imageUrl[1]}
+                      alt="After"
+                      className="w-full h-full object-cover"
+                    />
+                  }
+                  position={sliderPosition}
+                  onPositionChange={(position) => {
+                    if (!isAnimating) {
+                      setSliderPosition(position);
+                    }
+                  }}
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                  }}
+                  onlyHandleDraggable={true}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Legacy support for old types (backward compatibility)
     switch (type) {
       case "full-width":
         return (
@@ -179,7 +302,6 @@ const WorkDetail = () => {
         if (!Array.isArray(imageUrl) || imageUrl.length < 2) return null;
         return (
           <div className="w-full relative">
-            {/* Create a proper sticky container with background */}
             <div className="sticky top-[62px] z-20 w-full bg-opacity-10 pt-4 px-[10px]">
               <div className="flex justify-between items-center">
                 {sliderPosition !== 0 && (
@@ -204,7 +326,6 @@ const WorkDetail = () => {
               </div>
             </div>
 
-            {/* The compare slider below the sticky header */}
             <div className="mt-[-40px]">
               <div
                 className="cursor-pointer hover:opacity-90 transition-opacity"
@@ -381,8 +502,7 @@ const WorkDetail = () => {
             }')`,
             backgroundSize:
               deviceType === "desktop" ? "100% auto" : "auto 100%",
-            backgroundPosition:
-              deviceType === "desktop" ? `center 0px` : "center 0px",
+            backgroundPosition: `${work.hero_banner_position_x || 'center'} ${work.hero_banner_position_y || 'top'}`,
             backgroundRepeat: "no-repeat",
           }}
         ></div>

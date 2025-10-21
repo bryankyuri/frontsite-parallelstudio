@@ -937,49 +937,6 @@ const Home = () => {
           </div>
         </FadeInSection>
         <FadeInSection delay={0.3}>
-          <div id="ShowReel" className="lg:mb-[160px] mb-20">
-            <div
-              className="relative w-full"
-              style={{
-                paddingBottom:
-                  deviceType === "desktop"
-                    ? "calc(56.25% - 62px)"
-                    : "calc(86.25% - 62px)",
-              }}
-            >
-              <video
-                className="absolute top-0 left-0 w-full h-full object-cover"
-                src="https://videos.virtual-app.my.id/SHOWREEL_2024_Q4%20.mp4"
-                controls
-                controlsList="nodownload noplaybackrate"
-                playsInline
-                preload="metadata"
-                style={{ borderRadius: "0px" }}
-                onError={(e) => {
-                  console.log("Showreel video failed to load:", e);
-                }}
-                onLoadedData={() => {
-                  console.log("Showreel video loaded successfully");
-                }}
-                onPlay={(e) => {
-                  // Auto fullscreen when video starts playing
-                  if (e.target.requestFullscreen) {
-                    e.target.requestFullscreen().catch((err) => {
-                      console.log("Fullscreen request failed:", err);
-                    });
-                  } else if (e.target.webkitRequestFullscreen) {
-                    e.target.webkitRequestFullscreen();
-                  } else if (e.target.msRequestFullscreen) {
-                    e.target.msRequestFullscreen();
-                  }
-                }}
-              >
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-        </FadeInSection>
-        <FadeInSection delay={0.3}>
           <div className="px-[10px] w-full mb-[155px]">
             <div className="mt-[122px] text-left max-w-[574px] lg:text-[20px] text-[20px] lg:leading-[110%] leading-[100%] font-medium text-black">
               HAVE A PROJECT IN MIND? LET'S GET TO WORK.
