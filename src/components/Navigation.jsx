@@ -23,7 +23,7 @@ const Navigation = ({ deviceType }) => {
     if (lottieRef.current) {
       lottieRef.current.setDirection(-1);
       lottieRef.current.play();
-      
+
       // Function to check if animation reached beginning
       const checkAnimationProgress = () => {
         if (lottieRef.current && lottieRef.current.animationItem) {
@@ -36,7 +36,7 @@ const Navigation = ({ deviceType }) => {
           }
         }
       };
-      
+
       requestAnimationFrame(checkAnimationProgress);
     }
   };
@@ -60,9 +60,9 @@ const Navigation = ({ deviceType }) => {
                 animationData={logoLottieData}
                 loop={false}
                 autoplay={false}
-                style={{ 
-                  width: '196px', 
-                  height: 'auto',
+                style={{
+                  width: "196px",
+                  height: "auto",
                 }}
                 onComplete={() => {
                   // Optional: handle animation complete
@@ -104,15 +104,21 @@ const Navigation = ({ deviceType }) => {
         <>
           <header className={`bg-white fixed z-50 w-full text-black`}>
             <nav className="w-full mx-auto py-4 px-[10px] flex justify-between items-center">
-              <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+              <Link
+                to="/"
+                id="logoParallel"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xl font-bold flex justify-center items-center w-[196px] cursor-pointer"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
                 <Lottie
                   animationData={logoLottieData}
                   loop={false}
                   autoplay={false}
-                  style={{ 
-                    width: '196px', 
-                    height: 'auto',
-                    filter: 'invert(1)'
+                  style={{
+                    width: "196px",
+                    height: "auto",
                   }}
                 />
               </Link>
@@ -142,7 +148,7 @@ const Navigation = ({ deviceType }) => {
               </button>
             </nav>
           </header>
-          
+
           <div
             className={`fixed inset-0 bg-white z-40 transition-transform duration-300 ease-in-out text-black ${
               mobileMenuOpen ? "translate-y-0" : "-translate-y-full"

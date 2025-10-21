@@ -1,6 +1,6 @@
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
+const API_BASE_URL = process.env.NODE_ENV !== 'production' 
   ? import.meta.env.VITE_REACT_APP_API_URL
-  : 'https://staging-api.parallelstudio.asia/api';
+  : 'http://localhost:8000/api';
 
 export const fetchData = async (endpoint) => {
     const response = await fetch(`${API_BASE_URL}/${endpoint}`);
@@ -159,6 +159,40 @@ export const submitContact = async (contactData) => {
         }
         
         return await response.json();
+    } catch (error) {
+        console.error('Error submitting contact form:', error);
+        throw error;
+    }
+};
+
+// New Contact Submissions API with reCAPTCHA
+export const submitContactForm = async (formData) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/contact-submissions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            // Handle validation errors
+            if (response.status === 422 && result.errors) {
+                const error = new Error('Validation failed');
+                error.errors = result.errors;
+                error.status = 422;
+                throw error;
+            }
+            
+            // Handle other errors
+            throw new Error(result.message || 'Failed to submit form');
+        }
+        
+        return result;
     } catch (error) {
         console.error('Error submitting contact form:', error);
         throw error;

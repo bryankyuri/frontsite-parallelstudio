@@ -1,14 +1,22 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import Select from "react-select";
+import ReCAPTCHA from "react-google-recaptcha";
 import styles from "../styles/Contact.module.scss";
 import { AppContext } from "../context/AppContext";
 import { FadeInSection } from "../components/FadeInSection";
 import NavigationFormItem from "../components/NavigationFormItem";
 import TabNavigationForm from "../components/TabNavigationForm";
+import { submitContactForm } from "../api/index";
+import { RECAPTCHA_CONFIG, getRecaptchaToken } from "../utils/recaptcha";
 
 const Contact = () => {
   const { deviceType, vh } = useContext(AppContext);
   const [isShowForm, setIsShowForm] = useState(false);
+
+  // reCAPTCHA refs for each form
+  const careerRecaptchaRef = useRef(null);
+  const pitchRecaptchaRef = useRef(null);
+  const produceRecaptchaRef = useRef(null);
 
   // Form states for each form type
   const [pitchForm, setPitchForm] = useState({
@@ -38,6 +46,13 @@ const Contact = () => {
   const [partnerErrors, setPartnerErrors] = useState({});
   const [produceErrors, setProduceErrors] = useState({});
 
+  // reCAPTCHA error states
+  const [recaptchaErrors, setRecaptchaErrors] = useState({
+    career: "",
+    pitch: "",
+    produce: "",
+  });
+
   // Loading states for form submissions
   const [pitchLoading, setPitchLoading] = useState(false);
   const [partnerLoading, setPartnerLoading] = useState(false);
@@ -48,7 +63,10 @@ const Contact = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const formParam = urlParams.get("form");
 
-    if (formParam && ["pitch", "partner", "produce", "career"].includes(formParam)) {
+    if (
+      formParam &&
+      ["pitch", "partner", "produce", "career"].includes(formParam)
+    ) {
       setIsShowForm(formParam);
     }
   }, []);
@@ -185,34 +203,64 @@ const Contact = () => {
   const handlePitchSubmit = async (e) => {
     e.preventDefault();
 
+    // Clear previous errors
+    setPitchErrors({});
+    setRecaptchaErrors((prev) => ({ ...prev, career: "" }));
+
     const errors = validatePitchForm();
     setPitchErrors(errors);
 
     if (Object.keys(errors).length > 0) {
-      console.log("Pitch form validation failed:", errors);
+      console.log("Career form validation failed:", errors);
       return;
     }
 
     setPitchLoading(true);
 
     try {
-      console.log("Pitch form submitted:", pitchForm);
-      // Add your form submission logic here
-      // await submitPitchForm(pitchForm);
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken(careerRecaptchaRef);
 
-      // Reset form on success
-      setPitchForm({
-        name: "",
-        email: "",
-        portfolioLink: "",
-        message: "",
-        subject: null,
-      });
+      // Prepare form data
+      const formData = {
+        form_type: "career",
+        name: pitchForm.name,
+        email: pitchForm.email,
+        message: pitchForm.message,
+        subject: pitchForm.subject?.value || pitchForm.subject,
+        portfolio_link: pitchForm.portfolioLink,
+        recaptcha_token: recaptchaToken,
+      };
 
-      alert("Pitch form submitted successfully!");
+      const response = await submitContactForm(formData);
+
+      if (response.success) {
+        // Reset form on success
+        setPitchForm({
+          name: "",
+          email: "",
+          portfolioLink: "",
+          message: "",
+          subject: null,
+        });
+
+        // Reset reCAPTCHA
+        careerRecaptchaRef.current?.reset();
+
+        alert("Thank you for your submission! We will get back to you soon.");
+      } else {
+        throw new Error(response.message || "Submission failed");
+      }
     } catch (error) {
-      console.error("Error submitting pitch form:", error);
-      alert("Error submitting form. Please try again.");
+      console.error("Error submitting career form:", error);
+
+      if (error.message.includes("reCAPTCHA")) {
+        setRecaptchaErrors((prev) => ({ ...prev, career: error.message }));
+      } else if (error.status === 422 && error.errors) {
+        setPitchErrors(error.errors);
+      } else {
+        alert(error.message || "Error submitting form. Please try again.");
+      }
     } finally {
       setPitchLoading(false);
     }
@@ -221,33 +269,62 @@ const Contact = () => {
   const handlePartnerSubmit = async (e) => {
     e.preventDefault();
 
+    // Clear previous errors
+    setPartnerErrors({});
+    setRecaptchaErrors((prev) => ({ ...prev, pitch: "" }));
+
     const errors = validatePartnerForm();
     setPartnerErrors(errors);
 
     if (Object.keys(errors).length > 0) {
-      console.log("Partner form validation failed:", errors);
+      console.log("Pitch form validation failed:", errors);
       return;
     }
 
     setPartnerLoading(true);
 
     try {
-      console.log("Partner form submitted:", partnerForm);
-      // Add your form submission logic here
-      // await submitPartnerForm(partnerForm);
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken(pitchRecaptchaRef);
 
-      // Reset form on success
-      setPartnerForm({
-        name: "",
-        email: "",
-        documentLink: "",
-        message: "",
-      });
+      // Prepare form data
+      const formData = {
+        form_type: "pitch",
+        name: partnerForm.name,
+        email: partnerForm.email,
+        message: partnerForm.message,
+        document_link: partnerForm.documentLink,
+        recaptcha_token: recaptchaToken,
+      };
 
-      alert("Partner form submitted successfully!");
+      const response = await submitContactForm(formData);
+
+      if (response.success) {
+        // Reset form on success
+        setPartnerForm({
+          name: "",
+          email: "",
+          documentLink: "",
+          message: "",
+        });
+
+        // Reset reCAPTCHA
+        pitchRecaptchaRef.current?.reset();
+
+        alert("Thank you for your submission! We will get back to you soon.");
+      } else {
+        throw new Error(response.message || "Submission failed");
+      }
     } catch (error) {
-      console.error("Error submitting partner form:", error);
-      alert("Error submitting form. Please try again.");
+      console.error("Error submitting pitch form:", error);
+
+      if (error.message.includes("reCAPTCHA")) {
+        setRecaptchaErrors((prev) => ({ ...prev, pitch: error.message }));
+      } else if (error.status === 422 && error.errors) {
+        setPartnerErrors(error.errors);
+      } else {
+        alert(error.message || "Error submitting form. Please try again.");
+      }
     } finally {
       setPartnerLoading(false);
     }
@@ -255,6 +332,10 @@ const Contact = () => {
 
   const handleProduceSubmit = async (e) => {
     e.preventDefault();
+
+    // Clear previous errors
+    setProduceErrors({});
+    setRecaptchaErrors((prev) => ({ ...prev, produce: "" }));
 
     const errors = validateProduceForm();
     setProduceErrors(errors);
@@ -267,22 +348,47 @@ const Contact = () => {
     setProduceLoading(true);
 
     try {
-      console.log("Produce form submitted:", produceForm);
-      // Add your form submission logic here
-      // await submitProduceForm(produceForm);
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken(produceRecaptchaRef);
 
-      // Reset form on success
-      setProduceForm({
-        name: "",
-        email: "",
-        companyName: "",
-        message: "",
-      });
+      // Prepare form data
+      const formData = {
+        form_type: "produce",
+        name: produceForm.name,
+        email: produceForm.email,
+        message: produceForm.message,
+        company_name: produceForm.companyName,
+        recaptcha_token: recaptchaToken,
+      };
 
-      alert("Produce form submitted successfully!");
+      const response = await submitContactForm(formData);
+
+      if (response.success) {
+        // Reset form on success
+        setProduceForm({
+          name: "",
+          email: "",
+          companyName: "",
+          message: "",
+        });
+
+        // Reset reCAPTCHA
+        produceRecaptchaRef.current?.reset();
+
+        alert("Thank you for your submission! We will get back to you soon.");
+      } else {
+        throw new Error(response.message || "Submission failed");
+      }
     } catch (error) {
       console.error("Error submitting produce form:", error);
-      alert("Error submitting form. Please try again.");
+
+      if (error.message.includes("reCAPTCHA")) {
+        setRecaptchaErrors((prev) => ({ ...prev, produce: error.message }));
+      } else if (error.status === 422 && error.errors) {
+        setProduceErrors(error.errors);
+      } else {
+        alert(error.message || "Error submitting form. Please try again.");
+      }
     } finally {
       setProduceLoading(false);
     }
@@ -550,8 +656,23 @@ const Contact = () => {
                         )}
                       </div>
 
+                      {/* reCAPTCHA */}
+
                       {/* Submit Button */}
-                      <div className="w-full flex justify-end">
+                      <div className="w-full flex justify-between items-center">
+                        <div className="">
+                          <ReCAPTCHA
+                            ref={careerRecaptchaRef}
+                            sitekey={RECAPTCHA_CONFIG.SITE_KEY}
+                            theme={RECAPTCHA_CONFIG.THEME}
+                            size={RECAPTCHA_CONFIG.SIZE}
+                          />
+                          {recaptchaErrors.career && (
+                            <div className="text-red-500 text-xs mt-1 text-center">
+                              {recaptchaErrors.career}
+                            </div>
+                          )}
+                        </div>
                         <button
                           type="submit"
                           disabled={pitchLoading}
@@ -683,7 +804,20 @@ const Contact = () => {
                       </div>
 
                       {/* Submit Button */}
-                      <div className="w-full flex justify-end">
+                      <div className="w-full flex justify-between items-center">
+                        <div className="">
+                          <ReCAPTCHA
+                            ref={pitchRecaptchaRef}
+                            sitekey={RECAPTCHA_CONFIG.SITE_KEY}
+                            theme={RECAPTCHA_CONFIG.THEME}
+                            size={RECAPTCHA_CONFIG.SIZE}
+                          />
+                          {recaptchaErrors.pitch && (
+                            <div className="text-red-500 text-xs mt-1 text-center">
+                              {recaptchaErrors.pitch}
+                            </div>
+                          )}
+                        </div>
                         <button
                           type="submit"
                           disabled={partnerLoading}
@@ -811,7 +945,20 @@ const Contact = () => {
                       </div>
 
                       {/* Submit Button */}
-                      <div className="w-full flex justify-end">
+                      <div className="w-full flex justify-between items-center">
+                        <div className="">
+                          <ReCAPTCHA
+                            ref={produceRecaptchaRef}
+                            sitekey={RECAPTCHA_CONFIG.SITE_KEY}
+                            theme={RECAPTCHA_CONFIG.THEME}
+                            size={RECAPTCHA_CONFIG.SIZE}
+                          />
+                          {recaptchaErrors.produce && (
+                            <div className="text-red-500 text-xs mt-1 text-center">
+                              {recaptchaErrors.produce}
+                            </div>
+                          )}
+                        </div>
                         <button
                           type="submit"
                           disabled={produceLoading}
