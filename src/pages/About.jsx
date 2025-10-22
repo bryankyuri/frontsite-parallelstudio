@@ -94,21 +94,21 @@ const About = () => {
     },
     {
       id: "08",
-      name: "M. Irvan Setiawan",
-      jobDesk: "Senior VFX artist, Compositor",
-      imgUrl: "/assets/team/new/team_5.jpg",
-    },
-    {
-      id: "09",
       name: "Alvin Rizkyadi",
       jobDesk: "Junior Colorist",
       imgUrl: "/assets/team/new/team_6.jpg",
     },
     {
-      id: "10",
+      id: "09",
       name: "Michael Thung",
       jobDesk: "Junior VFX artist",
       imgUrl: "/assets/team/new/team_7.jpg",
+    },
+    {
+      id: "10",
+      name: "",
+      jobDesk: "",
+      imgUrl: "",
     },
     {
       id: "11",

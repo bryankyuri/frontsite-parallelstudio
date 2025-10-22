@@ -23,7 +23,10 @@ const WorkDetail = () => {
   // Add these state variables at the top of your component
   const [popupImage, setPopupImage] = useState(null);
   const [popupImageIndex, setPopupImageIndex] = useState(0);
+  const [popupFlatIndex, setPopupFlatIndex] = useState(null); // Track position in flattened array
   const [activeVideoTab, setActiveVideoTab] = useState("uploaded");
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false); // Track if video is playing
+  const [hasVideoStarted, setHasVideoStarted] = useState(false); // Track if video has been played at least once
   const [heroBannerFillMode, setHeroBannerFillMode] = useState(
     deviceType === "desktop" ? "100% auto" : "auto 100%"
   );
@@ -153,10 +156,45 @@ const WorkDetail = () => {
     };
   }, [work, deviceType]);
 
+  // Create a flattened array of all images (excluding comparison types)
+  const flattenedImages = React.useMemo(() => {
+    if (!work?.gallery_items) return [];
+    
+    const flattened = [];
+    work.gallery_items.forEach((item, galleryIndex) => {
+      // Skip comparison types
+      if (item.type.startsWith('compare-')) return;
+      
+      const images = Array.isArray(item.images) ? item.images : [item.images];
+      images.forEach((imageUrl, imageIndex) => {
+        flattened.push({
+          imageUrl,
+          galleryIndex,
+          imageIndex,
+          type: item.type,
+          allImages: item.images // Keep reference to all images in this gallery item
+        });
+      });
+    });
+    
+    return flattened;
+  }, [work?.gallery_items]);
+
   // Add this function to handle image clicks
-  const handleImageClick = (imageUrl, index = 0) => {
+  const handleImageClick = (imageUrl, index = 0, galleryIndex = null, itemType = null) => {
+    // Don't open popup for comparison type images
+    if (itemType && itemType.startsWith('compare-')) {
+      return;
+    }
+    
+    // Find the position in flattened array
+    const flatIndex = flattenedImages.findIndex(
+      img => img.galleryIndex === galleryIndex && img.imageIndex === index
+    );
+    
     setPopupImage(imageUrl);
     setPopupImageIndex(index);
+    setPopupFlatIndex(flatIndex >= 0 ? flatIndex : null);
     // Prevent body scroll when popup is open
     document.body.style.overflow = "hidden";
   };
@@ -165,8 +203,31 @@ const WorkDetail = () => {
   const closePopup = () => {
     setPopupImage(null);
     setPopupImageIndex(0);
+    setPopupFlatIndex(null);
     // Restore body scroll
     document.body.style.overflow = "";
+  };
+
+  // Helper function to navigate to next/prev image in flattened array
+  // Helper function to navigate to next/prev image in flattened array
+  const navigateGallery = (direction) => {
+    if (popupFlatIndex === null || flattenedImages.length === 0) return;
+    
+    let newFlatIndex = popupFlatIndex;
+    
+    if (direction === 'next' && popupFlatIndex < flattenedImages.length - 1) {
+      newFlatIndex = popupFlatIndex + 1;
+    } else if (direction === 'prev' && popupFlatIndex > 0) {
+      newFlatIndex = popupFlatIndex - 1;
+    }
+    
+    // If we moved to a different image, update the popup
+    if (newFlatIndex !== popupFlatIndex) {
+      const newImageData = flattenedImages[newFlatIndex];
+      setPopupImage(newImageData.imageUrl);
+      setPopupImageIndex(newImageData.imageIndex);
+      setPopupFlatIndex(newFlatIndex);
+    }
   };
 
   // Add keyboard navigation
@@ -176,73 +237,71 @@ const WorkDetail = () => {
 
       if (e.key === "Escape") {
         closePopup();
-      } else if (
-        e.key === "ArrowLeft" &&
-        Array.isArray(popupImage) &&
-        popupImageIndex > 0
-      ) {
-        setPopupImageIndex(popupImageIndex - 1);
-      } else if (
-        e.key === "ArrowRight" &&
-        Array.isArray(popupImage) &&
-        popupImageIndex < popupImage.length - 1
-      ) {
-        setPopupImageIndex(popupImageIndex + 1);
+      } else if (e.key === "ArrowLeft") {
+        // Navigate to previous image in flattened array
+        navigateGallery('prev');
+      } else if (e.key === "ArrowRight") {
+        // Navigate to next image in flattened array
+        navigateGallery('next');
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [popupImage, popupImageIndex]);
+  }, [popupImage, popupFlatIndex, flattenedImages]);
 
-  // Helper function to get aspect ratio class
+  // Helper function to get aspect ratio style
   const getAspectRatioStyle = (type) => {
-    // Extract aspect ratio from type (e.g., "full-16:9" -> "16:9")
+    // Extract aspect ratio from type and return CSS aspectRatio property
     if (type.includes('16:9')) {
-      return { paddingBottom: '56.25%' }; // 16:9 aspect ratio
+      return { aspectRatio: '16/9' };
+    } else if (type.includes('1.85:1')) {
+      return { aspectRatio: '1.85/1' };
     } else if (type.includes('2.35:1')) {
-      return { paddingBottom: '42.55%' }; // 2.35:1 CinemaScope aspect ratio
+      return { aspectRatio: '2.35/1' };
     } else if (type.includes('2.39:1')) {
-      return { paddingBottom: '41.84%' }; // 2.39:1 Panavision aspect ratio
+      return { aspectRatio: '2.39/1' };
+    } else if (type.includes('4:3')) {
+      return { aspectRatio: '4/3' };
     } else if (type.includes('4:5')) {
-      return { paddingBottom: '125%' }; // 4:5 portrait aspect ratio
+      return { aspectRatio: '4/5' }; // Legacy support
     }
-    return null; // Auto height for non-ratio types
+    return null;
   };
 
   // Update your renderImage function
-  const renderImage = (type, imageUrl) => {
+  const renderImage = (type, imageUrl, galleryIndex = null) => {
     // Add safety check for imageUrl
     if (!imageUrl) return null;
 
     const aspectRatioStyle = getAspectRatioStyle(type);
 
-    // Full Width Images (16:9, 2.35:1, 2.39:1)
+    // Full Width Images (16:9, 1.85:1, 2.35:1, 2.39:1, 4:3)
     if (type.startsWith('full-')) {
       return (
-        <div className="w-full relative overflow-hidden bg-black" style={aspectRatioStyle}>
+        <div className="w-full" style={aspectRatioStyle}>
           <img
             src={imageUrl}
             alt={work?.title || "Work image"}
-            className="absolute inset-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-            onClick={() => handleImageClick(imageUrl)}
+            className="w-full h-full object-cover cursor-pointer"
+            onClick={() => handleImageClick(imageUrl, 0, galleryIndex, type)}
           />
         </div>
       );
     }
 
-    // Two Column Images (16:9, 2.35:1, 2.39:1)
+    // Two Column Images (16:9, 1.85:1, 2.35:1, 2.39:1, 4:3)
     if (type.startsWith('2col-')) {
       if (!Array.isArray(imageUrl) || imageUrl.length === 0) return null;
       return (
         <div className="grid grid-cols-2 gap-[10px]">
           {imageUrl.map((url, index) => (
-            <div key={index} className="relative overflow-hidden bg-black" style={aspectRatioStyle}>
+            <div key={index} style={aspectRatioStyle}>
               <img
                 src={url}
                 alt={work?.title || "Work image"}
-                className="absolute inset-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => handleImageClick(imageUrl, index)}
+                className="w-full h-full object-cover cursor-pointer"
+                onClick={() => handleImageClick(url, index, galleryIndex, type)}
               />
             </div>
           ))}
@@ -250,7 +309,7 @@ const WorkDetail = () => {
       );
     }
 
-    // Before/After Comparison Images (16:9, 2.35:1, 2.39:1)
+    // Before/After Comparison Images (16:9, 1.85:1, 2.35:1, 2.39:1, 4:3)
     if (type.startsWith('compare-')) {
       if (!Array.isArray(imageUrl) || imageUrl.length < 2) return null;
       return (
@@ -283,39 +342,37 @@ const WorkDetail = () => {
           {/* The compare slider below the sticky header */}
           <div className="mt-[-40px]">
             <div
-              className="cursor-pointer hover:opacity-90 transition-opacity relative overflow-hidden bg-black"
+              className="relative h-auto"
               style={aspectRatioStyle}
-              onClick={() => handleImageClick(imageUrl)}
             >
-              <div className="absolute inset-0">
-                <ReactCompareSlider
-                  itemOne={
-                    <ReactCompareSliderImage
-                      src={imageUrl[0]}
-                      alt="Before"
-                      className="w-full h-full object-cover"
-                    />
+              <ReactCompareSlider
+                itemOne={
+                  <ReactCompareSliderImage
+                    src={imageUrl[0]}
+                    alt="Before"
+                    style={{
+                      objectFit: "cover",
+                    }}
+                  />
+                }
+                itemTwo={
+                  <ReactCompareSliderImage
+                    src={imageUrl[1]}
+                    alt="After"
+                    style={{
+                      objectFit: "cover",
+                    }}
+                  />
+                }
+                position={sliderPosition}
+                onPositionChange={(position) => {
+                  if (!isAnimating) {
+                    setSliderPosition(position);
                   }
-                  itemTwo={
-                    <ReactCompareSliderImage
-                      src={imageUrl[1]}
-                      alt="After"
-                      className="w-full h-full object-cover"
-                    />
-                  }
-                  position={sliderPosition}
-                  onPositionChange={(position) => {
-                    if (!isAnimating) {
-                      setSliderPosition(position);
-                    }
-                  }}
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                  }}
-                  onlyHandleDraggable={true}
-                />
-              </div>
+                }}
+                className="w-full h-full"
+                boundsPadding={0}
+              />
             </div>
           </div>
         </div>
@@ -330,8 +387,8 @@ const WorkDetail = () => {
             <img
               src={imageUrl}
               alt={work?.title || "Work image"}
-              className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-              onClick={() => handleImageClick(imageUrl)}
+              className="w-full object-cover cursor-pointer"
+              onClick={() => handleImageClick(imageUrl, 0, galleryIndex, type)}
             />
           </div>
         );
@@ -344,8 +401,8 @@ const WorkDetail = () => {
                 key={index}
                 src={url}
                 alt={work?.title || "Work image"}
-                className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => handleImageClick(imageUrl, index)}
+                className="w-full object-cover cursor-pointer"
+                onClick={() => handleImageClick(url, index, galleryIndex, type)}
               />
             ))}
           </div>
@@ -377,25 +434,27 @@ const WorkDetail = () => {
                 )}
               </div>
             </div>
-
             <div className="mt-[-40px]">
-              <div
-                className="cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => handleImageClick(imageUrl)}
-              >
+              <div className="cursor-pointer">
                 <ReactCompareSlider
                   itemOne={
                     <ReactCompareSliderImage
                       src={imageUrl[0]}
                       alt="Before"
-                      className="w-full object-cover"
+                      style={{
+                        objectFit: "cover",
+                        cursor: "pointer",
+                      }}
                     />
                   }
                   itemTwo={
                     <ReactCompareSliderImage
                       src={imageUrl[1]}
                       alt="After"
-                      className="w-full object-cover"
+                      style={{
+                        objectFit: "cover",
+                        cursor: "pointer",
+                      }}
                     />
                   }
                   position={sliderPosition}
@@ -404,11 +463,8 @@ const WorkDetail = () => {
                       setSliderPosition(position);
                     }
                   }}
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                  }}
-                  onlyHandleDraggable={true}
+                  className="w-full h-full"
+                  boundsPadding={0}
                 />
               </div>
             </div>
@@ -423,8 +479,8 @@ const WorkDetail = () => {
                 key={index}
                 src={url}
                 alt={work?.title || "Work image"}
-                className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => handleImageClick(imageUrl, index)}
+                className="w-full object-cover cursor-pointer"
+                onClick={() => handleImageClick(url, index, galleryIndex, type)}
               />
             ))}
           </div>
@@ -438,10 +494,13 @@ const WorkDetail = () => {
   const ImagePopup = () => {
     if (!popupImage) return null;
 
-    const isArrayImage = Array.isArray(popupImage);
-    const currentImage = isArrayImage
-      ? popupImage[popupImageIndex]
-      : popupImage;
+    const currentImage = popupImage;
+
+    // Check if there's a previous image in flattened array
+    const hasPrev = popupFlatIndex !== null && popupFlatIndex > 0;
+    
+    // Check if there's a next image in flattened array
+    const hasNext = popupFlatIndex !== null && popupFlatIndex < flattenedImages.length - 1;
 
     return (
       <div
@@ -457,38 +516,34 @@ const WorkDetail = () => {
             ✕
           </button>
 
-          {/* Navigation arrows for array images */}
-          {isArrayImage && popupImage.length > 1 && (
-            <>
-              {popupImageIndex > 0 && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setPopupImageIndex(popupImageIndex - 1);
-                  }}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:opacity-70 transition-opacity z-10"
-                >
-                  ‹
-                </button>
-              )}
-              {popupImageIndex < popupImage.length - 1 && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setPopupImageIndex(popupImageIndex + 1);
-                  }}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:opacity-70 transition-opacity z-10"
-                >
-                  ›
-                </button>
-              )}
-            </>
+          {/* Navigation arrows */}
+          {hasPrev && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateGallery('prev');
+              }}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:opacity-70 transition-opacity z-10"
+            >
+              ‹
+            </button>
+          )}
+          {hasNext && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateGallery('next');
+              }}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:opacity-70 transition-opacity z-10"
+            >
+              ›
+            </button>
           )}
 
-          {/* Image counter for array images */}
-          {isArrayImage && popupImage.length > 1 && (
+          {/* Image counter */}
+          {popupFlatIndex !== null && flattenedImages.length > 0 && (
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
-              {popupImageIndex + 1} / {popupImage.length}
+              {popupFlatIndex + 1} / {flattenedImages.length}
             </div>
           )}
 
@@ -679,7 +734,7 @@ const WorkDetail = () => {
                       : "text-white hover:bg-white hover:bg-opacity-20"
                   }`}
                 >
-                  Optimized (Low Bit Rate)
+                  Optimized
                 </button>
               )}
               {work.video_vimeo_url && (
@@ -732,36 +787,88 @@ const WorkDetail = () => {
             >
               {/* Video Player Content */}
               {activeVideoTab === "uploaded" && work.video_project_src ? (
-                <video
-                  className="absolute top-0 left-0 w-full h-full object-cover"
-                  src={work.video_project_src}
-                  poster={work.video_project_poster}
-                  controls
-                  controlsList="nodownload noplaybackrate"
-                  playsInline
-                  preload="metadata"
-                  style={{ borderRadius: "0px" }}
-                  onError={(e) => {
-                    console.log("Video Project video failed to load:", e);
-                  }}
-                  onLoadedData={() => {
-                    console.log("Video Project video loaded successfully");
-                  }}
-                  onPlay={(e) => {
-                    // Auto fullscreen when video starts playing
-                    if (e.target.requestFullscreen) {
-                      e.target.requestFullscreen().catch((err) => {
-                        console.log("Fullscreen request failed:", err);
-                      });
-                    } else if (e.target.webkitRequestFullscreen) {
-                      e.target.webkitRequestFullscreen();
-                    } else if (e.target.msRequestFullscreen) {
-                      e.target.msRequestFullscreen();
-                    }
-                  }}
-                >
-                  Your browser does not support the video tag.
-                </video>
+                <>
+                  {/* Custom Poster Overlay */}
+                  {!hasVideoStarted && work.video_project_poster && (
+                    <>
+                      <img
+                        src={work.video_project_poster}
+                        alt="Video poster"
+                        className="absolute top-0 left-0 w-full h-full object-cover z-20"
+                      />
+                      
+                      {/* Overlay content */}
+                      <div className="absolute inset-0 z-30">
+                        {/* Title on top left */}
+                        <div className="absolute top-4 left-4 lg:top-6 lg:left-6">
+                          <h2 className="text-white text-lg lg:text-2xl font-bold drop-shadow-lg">
+                            {work.title}
+                          </h2>
+                        </div>
+                        
+                        {/* Play button in center */}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const video = e.target.closest('.relative').querySelector('video');
+                            if (video) {
+                              video.play();
+                            }
+                          }}
+                          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-80 hover:bg-opacity-100 rounded-full w-20 h-20 lg:w-24 lg:h-24 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                          aria-label="Play video"
+                        >
+                          {/* Play icon SVG */}
+                          <svg 
+                            className="w-10 h-10 lg:w-12 lg:h-12 text-white ml-1" 
+                            fill="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </button>
+                      </div>
+                    </>
+                  )}
+                  
+                  <video
+                    className="absolute top-0 left-0 w-full h-full object-contain"
+                    src={work.video_project_src}
+                    controls
+                    controlsList="nodownload noplaybackrate"
+                    playsInline
+                    preload="metadata"
+                    style={{ borderRadius: "0px" }}
+                    onError={(e) => {
+                      console.log("Video Project video failed to load:", e);
+                    }}
+                    onLoadedData={() => {
+                      console.log("Video Project video loaded successfully");
+                    }}
+                    onPlay={(e) => {
+                      setIsVideoPlaying(true);
+                      setHasVideoStarted(true); // Mark that video has been played
+                      // Auto fullscreen when video starts playing
+                      if (e.target.requestFullscreen) {
+                        e.target.requestFullscreen().catch((err) => {
+                          console.log("Fullscreen request failed:", err);
+                        });
+                      } else if (e.target.webkitRequestFullscreen) {
+                        e.target.webkitRequestFullscreen();
+                      } else if (e.target.msRequestFullscreen) {
+                        e.target.msRequestFullscreen();
+                      }
+                    }}
+                    onPause={() => {
+                      setIsVideoPlaying(false);
+                    }}
+                    onEnded={() => {
+                      setIsVideoPlaying(false);
+                    }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </>
               ) : activeVideoTab === "vimeo" && work.video_vimeo_url ? (
                 <iframe
                   className="absolute top-0 left-0 w-full h-full"
@@ -816,12 +923,12 @@ const WorkDetail = () => {
         {/* Project Details */}
         <div className="w-full mx-auto lg:px-[10px]">
           {work.gallery_items && work.gallery_items.length > 0 ? (
-            work.gallery_items.map((item) => (
+            work.gallery_items.map((item, index) => (
               <div key={item.id} className="mb-[10px]">
                 <FadeInSection delay={0.3}>
                   {item.images &&
                     item.images.length > 0 &&
-                    renderImage(item.type, item.images)}
+                    renderImage(item.type, item.images, index)}
                 </FadeInSection>
               </div>
             ))
