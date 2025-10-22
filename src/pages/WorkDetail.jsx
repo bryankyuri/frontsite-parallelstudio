@@ -24,6 +24,9 @@ const WorkDetail = () => {
   const [popupImage, setPopupImage] = useState(null);
   const [popupImageIndex, setPopupImageIndex] = useState(0);
   const [activeVideoTab, setActiveVideoTab] = useState("uploaded");
+  const [heroBannerFillMode, setHeroBannerFillMode] = useState(
+    deviceType === "desktop" ? "100% auto" : "auto 100%"
+  );
 
   // Fetch work detail using TanStack Query (includes related works)
   const {
@@ -100,6 +103,55 @@ const WorkDetail = () => {
       }
     }
   }, [work]);
+
+  // Detect if hero banner image fills the container height
+  useEffect(() => {
+    if (!work?.hero_banner_image) {
+      // Set default based on device type
+      setHeroBannerFillMode(deviceType === "desktop" ? "100% auto" : "auto 100%");
+      return;
+    }
+
+    const img = new Image();
+    img.src = work.hero_banner_image;
+    
+    img.onload = () => {
+      const imageAspectRatio = img.naturalWidth / img.naturalHeight;
+      
+      // Check if image is 16:9 (1.777) or 4:3 (1.333)
+      const is16by9 = Math.abs(imageAspectRatio - (16/9)) < 0.01; // ~1.777
+      const is4by3 = Math.abs(imageAspectRatio - (4/3)) < 0.01; // ~1.333
+
+      console.log('Hero Banner Debug:', {
+        deviceType,
+        imageWidth: img.naturalWidth,
+        imageHeight: img.naturalHeight,
+        imageAspectRatio: imageAspectRatio.toFixed(3),
+        is16by9,
+        is4by3
+      });
+
+      if (is16by9 || is4by3) {
+        // For 16:9 or 4:3, use the default behavior
+        if (deviceType === "desktop") {
+          console.log('Using 100% auto (16:9 or 4:3 ratio)');
+          setHeroBannerFillMode("100% auto");
+        } else {
+          console.log('Using auto 100% (16:9 or 4:3 ratio)');
+          setHeroBannerFillMode("auto 100%");
+        }
+      } else {
+        // For other ratios, always use auto 100% to fill height
+        console.log('Using auto 100% (non-standard ratio)');
+        setHeroBannerFillMode("auto 100%");
+      }
+    };
+
+    img.onerror = () => {
+      console.error('Failed to load hero banner image');
+      setHeroBannerFillMode(deviceType === "desktop" ? "100% auto" : "auto 100%");
+    };
+  }, [work, deviceType]);
 
   // Add this function to handle image clicks
   const handleImageClick = (imageUrl, index = 0) => {
@@ -500,8 +552,7 @@ const WorkDetail = () => {
             backgroundImage: `url('${
               work.hero_banner_image || "/hero-banner-detailwork.jpg"
             }')`,
-            backgroundSize:
-              deviceType === "desktop" ? "100% auto" : "auto 100%",
+            backgroundSize: heroBannerFillMode,
             backgroundPosition: `${work.hero_banner_position_x || 'center'} ${work.hero_banner_position_y || 'top'}`,
             backgroundRepeat: "no-repeat",
           }}
