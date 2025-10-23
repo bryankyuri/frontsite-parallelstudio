@@ -10,14 +10,12 @@ import { useWorksList } from "../hooks/useWorksList";
 
 const Works = () => {
   const [activeFilters, setActiveFilters] = useState(["all"]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("film/series");
   const [selectedTags, setSelectedTags] = useState([]);
   const { deviceType } = useContext(AppContext);
 
   // Build API filters
   const apiFilters = {
-    sort_by: "published_at",
-    sort_direction: "desc",
     per_page: 50, // Get more items for filtering
   };
 
@@ -42,7 +40,7 @@ const Works = () => {
   const works = worksResponse?.data || [];
 
   // Extract typeTags and tags from API response
-  const typeCategory = ["film/series", "commercial"]; // These are typeTags
+  const typeCategory = ["film/series", "commercial", "music video"]; // These are typeTags
   const typeTags = ["all", "motion graphic", "color grading", "cgi", "vfx"]; // These are tags
   // Handle filter toggle for type (typeTags: film/series, commercial)
   const handleTypeToggle = (category) => {
@@ -156,20 +154,41 @@ const Works = () => {
               ))}
             </div>
           ) : (
-            <div className="flex justify-center mt-[117px] gap-[10px] ">
-              {typeCategory.map((category, index) => (
-                <button
-                  key={index}
-                  className={`px-4 py-2 font-bold transition-all duration-200 w-full ${
-                    selectedCategory === category
-                      ? "bg-white border border-black text-black"
-                      : "bg-[#F0F0F0] text-[#787878] hover:bg-gray-300"
-                  }`}
-                  onClick={() => handleTypeToggle(category)}
-                >
-                  {category.toUpperCase()}
-                </button>
-              ))}
+            <div className="mt-[117px] mb-[10px]">
+              <div className="w-full border border-black bg-white ">
+                <div className="flex items-center pl-4 pr-2 py-3 h-[56px]">
+                  <span className="text-black mr-2 whitespace-nowrap ">CATEGORY:</span>
+                  <select
+                    value={selectedCategory || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "") {
+                        handleTypeToggle(null);
+                      } else {
+                        if (selectedCategory === value) {
+                          handleTypeToggle(value);
+                        } else {
+                          setSelectedCategory(value);
+                        }
+                      }
+                    }}
+                    className="flex-1 bg-white text-black font-bold focus:outline-none cursor-pointer appearance-none text-right"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='black' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 0.5rem center',
+                      paddingRight: '2rem'
+                    }}
+                  >
+                    <option value="">ALL CATEGORIES</option>
+                    {typeCategory.map((category, index) => (
+                      <option key={index} value={category}>
+                        {category.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
           )}
         </FadeInSection>

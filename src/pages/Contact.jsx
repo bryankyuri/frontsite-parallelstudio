@@ -395,13 +395,9 @@ const Contact = () => {
   };
 
   const subjectOptions = [
-    { value: "Producer", label: "PRODUCER" },
-    { value: "Director", label: "DIRECTOR" },
-    { value: "Editor", label: "EDITOR" },
-    { value: "VFX Artist", label: "VFX ARTIST" },
-    { value: "Sound Designer", label: "SOUND DESIGNER" },
-    { value: "Cinematographer", label: "CINEMATOGRAPHER" },
-    { value: "Scriptwriter", label: "SCRIPTWRITER" },
+    { value: "VFX Department", label: "VFX DEPARTMENT" },
+    { value: "Color Department", label: "COLOR DEPARTMENT" },
+    { value: "Producer Team", label: "PRODUCER TEAM" }
   ];
 
   const customSelectStyles = {

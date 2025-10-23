@@ -124,6 +124,7 @@ const WorkDetail = () => {
       // Check if image is 16:9 (1.777) or 4:3 (1.333)
       const is16by9 = Math.abs(imageAspectRatio - (16/9)) < 0.01; // ~1.777
       const is4by3 = Math.abs(imageAspectRatio - (4/3)) < 0.01; // ~1.333
+      const is185by1 = Math.abs(imageAspectRatio - (1.85/1)) < 0.01; // ~1.85
 
       console.log('Hero Banner Debug:', {
         deviceType,
@@ -131,10 +132,11 @@ const WorkDetail = () => {
         imageHeight: img.naturalHeight,
         imageAspectRatio: imageAspectRatio.toFixed(3),
         is16by9,
-        is4by3
+        is4by3,
+        is185by1
       });
 
-      if (is16by9 || is4by3) {
+      if (is16by9 || is4by3 || is185by1) {
         // For 16:9 or 4:3, use the default behavior
         if (deviceType === "desktop") {
           console.log('Using 100% auto (16:9 or 4:3 ratio)');
