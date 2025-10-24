@@ -1,7 +1,7 @@
 // Simple Google Analytics service for basic visitor tracking
 class GoogleAnalyticsService {
   constructor() {
-    this.GA_MEASUREMENT_ID = 'G-Q59D8YQ7NF';
+    this.GA_MEASUREMENT_ID = import.meta.env.VITE_ANALYTIC;
     this.isInitialized = false;
     this.init();
   }

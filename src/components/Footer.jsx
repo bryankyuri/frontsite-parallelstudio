@@ -60,20 +60,12 @@ const Footer = ({ deviceType }) => {
               INSTAGRAM
             </a>
             <a
-              href="https://www.youtube.com/"
+              href="https://www.youtube.com/channel/UC2Zqwr38NBP6ZDeccHtP1HQ"
               target="_blank"
               rel="noopener noreferrer"
               className="lg:border-none border-t border-black lg:py-0 py-2"
             >
               YOUTUBE
-            </a>
-            <a
-              href="https://www.vimeo.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="lg:border-none border-t border-black lg:py-0 py-2"
-            >
-              VIMEO
             </a>
           </div>
         </div>

@@ -58,6 +58,9 @@ const Contact = () => {
   const [partnerLoading, setPartnerLoading] = useState(false);
   const [produceLoading, setProduceLoading] = useState(false);
 
+  // Success popup state
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
   // Check URL parameters on component mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -247,7 +250,7 @@ const Contact = () => {
         // Reset reCAPTCHA
         careerRecaptchaRef.current?.reset();
 
-        alert("Thank you for your submission! We will get back to you soon.");
+        setShowSuccessPopup(true);
       } else {
         throw new Error(response.message || "Submission failed");
       }
@@ -311,7 +314,7 @@ const Contact = () => {
         // Reset reCAPTCHA
         pitchRecaptchaRef.current?.reset();
 
-        alert("Thank you for your submission! We will get back to you soon.");
+        setShowSuccessPopup(true);
       } else {
         throw new Error(response.message || "Submission failed");
       }
@@ -375,7 +378,7 @@ const Contact = () => {
         // Reset reCAPTCHA
         produceRecaptchaRef.current?.reset();
 
-        alert("Thank you for your submission! We will get back to you soon.");
+        setShowSuccessPopup(true);
       } else {
         throw new Error(response.message || "Submission failed");
       }
@@ -500,13 +503,13 @@ const Contact = () => {
           className={`w-full bg-black text-white py-32 relative ${styles.heroBanner} flex flex-col lg:justify-center lg:items-center justify-start items-center mb-[140px] lg:mb-[140px]`}
           style={{
             height: deviceType === "desktop" ? "1018px" : "auto",
-            backgroundImage: `url('/hero-banner-contact.jpg')`,
-            backgroundSize:
-              deviceType === "desktop" ? "auto 100%" : "auto 100%",
-            backgroundPosition:
-              deviceType === "desktop" ? `right 0px` : "90% 0px",
-            backgroundRepeat: "no-repeat",
-            backgroundColor: "#0a0408",
+            // backgroundImage: `url('/hero-banner-contact.jpg')`,
+            // backgroundSize:
+            //   deviceType === "desktop" ? "auto 100%" : "auto 100%",
+            // backgroundPosition:
+            //   deviceType === "desktop" ? `right 0px` : "90% 0px",
+            // backgroundRepeat: "no-repeat",
+            backgroundColor: "#000",
           }}
         >
           {isShowForm ? (
@@ -997,6 +1000,60 @@ const Contact = () => {
           )}
         </div>
       </FadeInSection>
+
+      {/* Success Popup Modal */}
+      {showSuccessPopup && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowSuccessPopup(false)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl max-w-md w-[90%] mx-4 p-8 relative animate-fadeIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowSuccessPopup(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Close"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
+            {/* Content */}
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-black mb-2">
+                Thank You!
+              </h2>
+              <p className="text-gray-700 mb-8">
+                We've received your submission and will get back to you soon.
+              </p>
+              <p className="text-gray-400 text-xs mb-6">
+                If you're unable to pick up or you've changed your mind, please
+                email us at INFO@PARALLEL.ASIA
+              </p>
+              <button
+                onClick={() => setShowSuccessPopup(false)}
+                className="w-full border border-black bg-white text-black py-3 px-6 font-semibold hover:bg-black hover:text-white transition-colors"
+              >
+                CLOSE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

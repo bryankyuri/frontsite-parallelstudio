@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { IconTriangle } from "../components/Icon/IconTriangle";
 
 const About = () => {
-  const { deviceType } = useContext(AppContext);
+  const { deviceType, isMobile } = useContext(AppContext);
   // Initialize with the first accordion open
   const [openAccordions, setOpenAccordions] = useState({ "01": true });
   const [openAccordionsJob, setOpenAccordionsJob] = useState("01");
@@ -25,27 +25,27 @@ const About = () => {
   const services = [
     {
       id: "01",
-      title: "COLOR GRADING & FINISHING",
+      title: "COLOR GRADING",
       description:
-        "Our infrastructure allows our color artists to work in every format—2K, 4K, DPX, Open EXR, .r3dnative, anything you can bring to our shop—and tailor the look for any delivery specification. Allstudios are designed to work in any and every workflow & format you need, from the traditional standard of ACES, 10-bit DPX to 16-bit Open EXR.",
+        "Our infrastructure allows our colorists to work with all format. 2K, 4K, DPX, Open EXR, .r3d and more. And tailor the look for any delivery specification. All our suites are designed to support any workflow & format you need, from the traditional standard of ACES, 10-bit DPX to 16-bit Open EXR.",
     },
     {
       id: "02",
-      title: "REMOTE COLOR GRADING",
+      title: "REMOTE GRADING",
       description:
-        " Our team are keen to work with fellow artists and storytellers around the globe. With todays technology we are not bound to physical meetings. Work with us. From your couch.",
+        "Our team is keen to collaborate with fellow artists and storytellers around the globe. With today’s technology, we are no longer bound by physical sessions. Work with us from anywhere. From your couch.",
     },
     {
       id: "03",
       title: "ONLINE EDITING (VFX)",
       description:
-         "Our studio is home to a dynamic team of 2D artists, designers, motion graphics specialists, compositors, and 3D artists, all dedicated to bringing your vision to life through exceptional visual effects and post-production artistry.",
+        "Our studio is home to a dynamic team of 2D artists, designers, motion graphics specialists, compositors and 3D artists. All dedicated to bringing your vision to life through exceptional visual effects and post-production artistry",
     },
     {
       id: "04",
       title: "DRY HIRE",
       description:
-        " For artists and collaborators who are looking for workplace to finish their projects. Local and foreign people who are happen to stay in Indonesia are welcome in our place.",
+        "Dry-hire studio space for artists and collaborators who need a place to work and finish their projects. Local and international creatives staying in Indonesia are always welcome.",
     },
   ];
 
@@ -95,7 +95,7 @@ const About = () => {
     {
       id: "08",
       name: "Alvin Rizkyadi",
-      jobDesk: "Junior Colorist",
+      jobDesk: "Colorist",
       imgUrl: "/assets/team/new/team_6.jpg",
     },
     {
@@ -180,7 +180,7 @@ const About = () => {
 
   return (
     <div className={styles.about}>
-      <section
+      {/* <section
         className={`w-full bg-black text-white py-32 relative ${styles.heroBanner} flex lg:justify-center lg:items-center justify-start items-end`}
         style={{
           height:
@@ -192,33 +192,20 @@ const About = () => {
           backgroundPosition: `center 0px`,
           backgroundRepeat: "no-repeat",
         }}
-      >
-        <div className="w-full mx-auto lg:text-center z-[2] relative lg:px-0 px-5 ">
-          <h1 className="lg:text-[40px] text-[36px] leading-[115%] font-bold">
-            <FadeInSection delay={0.3}>
-              {deviceType === "desktop" ? (
-                <>
-                  WE EAGER TO PARTNER WITH
-                  <br />
-                  GREAT STORYTELLER
-                </>
-              ) : (
-                <>
-                  WE EAGER TO <br />
-                  PARTNER WITH
-                  <br />
-                  GREAT
-                  <br /> STORYTELLER
-                </>
-              )}
-            </FadeInSection>
-          </h1>
-        </div>
+      ></section> */}
+
+      <section className="w-full ">
+        <img
+          src={isMobile ? "/bg-about-mobile.jpg" : "bg-about-desktop.jpg"}
+          width={"100%"}
+          height={"auto"}
+        />
       </section>
       <FadeInSection delay={0.3}>
-        <section className="company-intro py-20">
-          <div className="w-full mx-auto px-6">
-            <p className="w-full lg:max-w-[670px] mx-auto lg:text-center text-justify px-[40px] lg:px-0 mb-[140px] lg:mt-[140px] mt-[90px] text-[#969696] lg:text-[16px] text-[14px] leading-[120%]">
+        <section className="company-intro lg:py-20 lg:mb-20">
+          <div className="w-full mx-auto px-6 text-[#969696]">
+            <div className="px-[36px] lg:max-w-[670px] mx-auto lg:mt-[140px] mt-[80px] mb-[32px] lg:mb-[40px] lg:text-center font-bold">WE EAGER TO PARTNER WITH GREAT STORYTELLER</div>
+            <p className="w-full lg:max-w-[670px] mx-auto lg:text-center text-justify px-[36px] lg:px-0 mb-[80px]   lg:text-[16px] text-[14px]">
               Founded in 2019, Parallel Studio is a Jakarta-based
               post-production company that specializes in delivering
               high-quality content across a wide range of media. What began as a
@@ -239,7 +226,7 @@ const About = () => {
         </section>
       </FadeInSection>
 
-      <section className="services py-20" id="our-services">
+      <section className="services lg:py-20" id="our-services">
         <div className="w-full px-[10px]">
           <FadeInSection delay={0.3}>
             <h2 className="  lg:text-[20px] text-[16px] font-bold pb-20 text-black">
@@ -329,7 +316,10 @@ const About = () => {
         <section className="services py-20" id="send-portofolio">
           <div className="w-full px-[10px] flex flex-col lg:flex-row lg:items-start lg:justify-between">
             <div className="lg:w-[80%] w-full">
-              <Link to="/contact?form=career" className="w-[246px] h-[51px] flex justify-center items-center border bg-black border-black  text-white hover:bg-white hover:border-black  hover:text-black font-semibold rounded mb-10 transition-all duration-[0.3s]">
+              <Link
+                to="/contact?form=career"
+                className="w-[246px] h-[51px] flex justify-center items-center border bg-black border-black  text-white hover:bg-white hover:border-black  hover:text-black font-semibold rounded mb-10 transition-all duration-[0.3s]"
+              >
                 SEND US YOUR PORTFOLIO
               </Link>
             </div>
